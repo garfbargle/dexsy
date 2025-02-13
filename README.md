@@ -1,4 +1,4 @@
-# Card Deck Builder
+# 📕 Dexsy: Pokémon™ Fantasy Deck Builder
 
 A web application for building and managing custom card decks. Create, edit, and organize your card collections with an intuitive interface.
 
@@ -33,3 +33,6 @@ Feel free to submit issues and enhancement requests!
 ## License
 
 This project is open source and available under the MIT License. 
+
+## Disclaimer
+Dexsy was built with ❤️ by a fan like you. We are not affiliated with, endorsed, sponsored, or specifically approved by Nintendo, The Pokémon™ Company, or any of their affiliates.
