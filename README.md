@@ -18,6 +18,7 @@ A web application for building and managing custom card decks. Create, edit, and
 - Real-time deck statistics
 - Save your deck
 - Import saved decks
+- Simulate starting hand and prize cards on decks with 40+ cards
 
 ## Technologies Used
 
