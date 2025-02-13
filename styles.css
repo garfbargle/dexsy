@@ -70,6 +70,12 @@
         
         .deck-display {
             background-color: var(--card-bg);
+            background-image: linear-gradient(45deg, #e0e0e0 25%, transparent 25%),
+                              linear-gradient(-45deg, #e0e0e0 25%, transparent 25%),
+                              linear-gradient(45deg, transparent 75%, #e0e0e0 75%),
+                              linear-gradient(-45deg, transparent 75%, #e0e0e0 75%);
+            background-size: 40px 40px;
+            background-position: 0 0, 0 20px, 20px -20px, -20px 0px;
             border-radius: 15px;
             padding: 20px;
             min-height: 300px;
@@ -77,6 +83,7 @@
             display: grid;
             grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
             gap: 15px;
+            grid-auto-rows: 1fr;
         }
         
         .search-section {
@@ -123,27 +130,38 @@
             background-color: white;
             border-radius: 8px;
             box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            grid-auto-rows: 1fr;
         }
         
         .card {
             background: white;
             border-radius: 15px;
             padding: 10px;
-            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+            box-shadow: 
+                0 2px 4px rgba(0,0,0,0.1),
+                0 8px 16px rgba(0,0,0,0.1),
+                0 16px 32px rgba(0,0,0,0.05);
             transition: all 0.3s ease;
             position: relative;
             overflow: hidden;
+            aspect-ratio: 2.5/3.5;
+            display: flex;
+            flex-direction: column;
         }
         
         .card:hover {
             transform: translateY(-5px);
-            box-shadow: 0 8px 25px rgba(0,0,0,0.15);
+            box-shadow: 
+                0 4px 8px rgba(0,0,0,0.15),
+                0 12px 24px rgba(0,0,0,0.15),
+                0 24px 48px rgba(0,0,0,0.1);
         }
         
         .card img {
             width: 100%;
-            height: auto;
+            height: 100%;
             border-radius: 10px;
+            object-fit: contain;
         }
         
         header {
