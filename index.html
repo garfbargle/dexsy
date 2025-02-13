@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
+    <link rel="stylesheet" href="styles.css">
+    <script src="DeckBuilder.js"></script>
+    <title>⚡ Dexsy: Pokémon™ Deck Builder</title>
+</head>
+<body>
+    <div class="container">
+
+        <div class="button-container">
+            <button id="clearBtn" aria-label="Clear deck" data-label="Clear">
+                🗑️
+            </button>
+            <button id="exportBtn" aria-label="Export deck" data-label="Save">
+                💾
+            </button>
+            <button id="importBtn" aria-label="Import deck" data-label="Import">
+                📂
+            </button>
+        </div>
+        <h1>⚡ 📕 Dexsy ⚡</h1>
+        <h2> Pokémon™ Fantasy Deck Builder</h2>
+        
+        <div class="deck-stats">
+            <div class="stat">🎴 Total: <span id="total-count">0</span></div>
+            <div class="stat">✨ Pokémon™: <span id="pokemon-count">0</span></div>
+            <div class="stat">⚡ Energy: <span id="energy-count">0</span></div>
+            <div class="stat">🎯 Trainers: <span id="trainer-count">0</span></div>
+        </div>
+
+        <div id="deck-display" class="deck-display">
+            <!-- Cards will be displayed here -->
+        </div>
+
+        <div class="search-section">
+            <input type="text" id="search-input" placeholder="🔍 Search for Pokémon™ cards...">
+            <button id="search-button">🔎 Search</button>
+        </div>
+
+        <div id="search-results" class="search-results">
+            <!-- Search results will be displayed here -->
+        </div>
+
+        <div class="disclaimer">
+            Dexsy was built with ❤️ by a fan like you. We are not affiliated with, endorsed, sponsored, or specifically approved by Nintendo, The Pokémon™ Company, or any of their affiliates.
+        </div>
+    </div>
+</body>
+</html> 

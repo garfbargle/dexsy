@@ -1,0 +1,621 @@
+        /* Add your CSS styles here */
+        :root {
+            --primary-color: #FF0000;
+            --secondary-color: #CC0000;
+            --background-color: #f0f0f0;
+            --card-bg: #ffffff;
+            --text-color: #333333;
+            --pokemon-yellow: #FFDE00;
+            --pokemon-blue: #3B4CCA;
+            --gradient-start: #FF0000;
+            --gradient-end: #CC0000;
+        }
+        
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+        
+        body {
+            font-family: 'Segoe UI', system-ui, sans-serif;
+            line-height: 1.6;
+            padding: 20px;
+            background-color: var(--background-color);
+            background-image: linear-gradient(45deg, #f0f0f0 25%, transparent 25%),
+                              linear-gradient(-45deg, #f0f0f0 25%, transparent 25%),
+                              linear-gradient(45deg, transparent 75%, #f0f0f0 75%),
+                              linear-gradient(-45deg, transparent 75%, #f0f0f0 75%);
+            background-size: 20px 20px;
+            background-position: 0 0, 0 10px, 10px -10px, -10px 0px;
+        }
+        
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+        
+        h1 {
+            text-align: center;
+            margin: 20px 0;
+            color: var(--pokemon-blue);
+            font-size: 2.5rem;
+            text-shadow: 2px 2px var(--pokemon-yellow);
+        }
+        
+        h2 {
+            text-align: center;
+            margin: 10px 0 20px 0;
+            color: var(--pokemon-blue);
+            font-size: 1.8rem;
+            text-shadow: 2px 2px var(--pokemon-yellow);
+        }
+        
+        .deck-stats {
+            display: flex;
+            justify-content: space-around;
+            background: linear-gradient(135deg, var(--gradient-start), var(--gradient-end));
+            padding: 15px;
+            border-radius: 15px;
+            margin-bottom: 20px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+            color: white;
+        }
+        
+        .stat {
+            font-weight: bold;
+            font-size: 1.1rem;
+            text-shadow: 1px 1px rgba(0,0,0,0.2);
+        }
+        
+        .deck-display {
+            background-color: var(--card-bg);
+            border-radius: 15px;
+            padding: 20px;
+            min-height: 300px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+            gap: 15px;
+        }
+        
+        .search-section {
+            display: flex;
+            gap: 10px;
+            margin: 20px 0;
+        }
+        
+        #search-input {
+            flex: 1;
+            padding: 12px 20px;
+            border: 2px solid var(--pokemon-yellow);
+            border-radius: 25px;
+            font-size: 1rem;
+            transition: all 0.3s ease;
+        }
+        
+        #search-input:focus {
+            outline: none;
+            border-color: var(--pokemon-blue);
+            box-shadow: 0 0 0 3px rgba(59, 76, 202, 0.2);
+        }
+        
+        #search-button {
+            padding: 12px 25px;
+            background: linear-gradient(135deg, var(--pokemon-blue), #2a3899);
+            color: white;
+            border: none;
+            border-radius: 25px;
+            cursor: pointer;
+            font-weight: bold;
+            transition: transform 0.2s ease;
+        }
+        
+        #search-button:hover {
+            transform: translateY(-2px);
+        }
+        
+        .search-results {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+            gap: 15px;
+            padding: 15px;
+            background-color: white;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        
+        .card {
+            background: white;
+            border-radius: 15px;
+            padding: 10px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 8px 25px rgba(0,0,0,0.15);
+        }
+        
+        .card img {
+            width: 100%;
+            height: auto;
+            border-radius: 10px;
+        }
+        
+        header {
+            background-color: white;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+            position: fixed;
+            width: 100%;
+            top: 0;
+            z-index: 1000;
+        }
+        
+        nav {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 1rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .logo {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: var(--primary-color);
+        }
+        
+        nav ul {
+            display: flex;
+            list-style: none;
+            gap: 2rem;
+        }
+        
+        nav a {
+            text-decoration: none;
+            color: var(--text-color);
+            font-weight: 600;
+        }
+        
+        main {
+            margin-top: 80px;
+        }
+        
+        #hero {
+            text-align: center;
+            padding: 4rem 2rem;
+            background: linear-gradient(rgba(0,0,0,0.5), rgba(0,0,0,0.5)), 
+                        url('pokemon-bg.jpg') center/cover;
+            color: white;
+        }
+        
+        .cta-button {
+            display: inline-block;
+            padding: 1rem 2rem;
+            background-color: var(--primary-color);
+            color: white;
+            text-decoration: none;
+            border-radius: 5px;
+            margin-top: 1rem;
+            transition: background-color 0.3s;
+        }
+        
+        .deck-builder-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 2rem;
+            display: grid;
+            grid-template-columns: 7fr 3fr;
+            gap: 2rem;
+        }
+        
+        .step {
+            display: none;
+            padding: 2rem;
+            background: white;
+            border-radius: 10px;
+            margin-bottom: 1rem;
+        }
+        
+        .step.active {
+            display: block;
+        }
+        
+        .card-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+            gap: 1rem;
+            margin-top: 1rem;
+        }
+        
+        .deck-summary {
+            background: white;
+            padding: 2rem;
+            border-radius: 10px;
+            position: sticky;
+            top: 100px;
+        }
+        
+        footer {
+            text-align: center;
+            padding: 2rem;
+            background-color: var(--text-color);
+            color: white;
+        }
+        
+        @media (max-width: 768px) {
+            .deck-builder-container {
+                grid-template-columns: 1fr;
+            }
+            
+            nav ul {
+                display: none;
+            }
+        }
+        
+        .card button {
+            width: 100%;
+            padding: 0.5rem;
+            border: none;
+            border-radius: 5px;
+            background-color: var(--primary-color);
+            color: white;
+            cursor: pointer;
+            transition: background-color 0.3s;
+        }
+        
+        .card button.selected {
+            background-color: var(--secondary-color);
+        }
+        
+        .trainer-pack {
+            background: white;
+            border-radius: 10px;
+            padding: 1rem;
+            margin-bottom: 1rem;
+            display: grid;
+            grid-template-columns: 100px 1fr;
+            gap: 1rem;
+            align-items: center;
+        }
+        
+        .trainer-pack img {
+            width: 100px;
+            height: 100px;
+            object-fit: cover;
+            border-radius: 50%;
+        }
+        
+        .trainer-pack ul {
+            list-style: none;
+            margin: 0.5rem 0;
+        }
+        
+        .energy-card {
+            background: white;
+            border-radius: 10px;
+            padding: 1rem;
+            text-align: center;
+        }
+        
+        .energy-card img {
+            width: 80px;
+            height: 80px;
+            margin-bottom: 0.5rem;
+        }
+        
+        .energy-controls {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 1rem;
+        }
+        
+        .energy-controls button {
+            width: 30px;
+            height: 30px;
+            border: none;
+            border-radius: 50%;
+            background-color: var(--primary-color);
+            color: white;
+            cursor: pointer;
+        }
+        
+        .deck-total {
+            margin-top: 2rem;
+            padding-top: 1rem;
+            border-top: 2px solid var(--background-color);
+        }
+        
+        .deck-total p {
+            font-size: 1.25rem;
+            font-weight: 600;
+            margin-bottom: 1rem;
+        }
+        
+        .card .remove-button {
+            position: absolute;
+            top: -8px;
+            right: -8px;
+            background: #ff4444;
+            color: white;
+            border: none;
+            border-radius: 50%;
+            width: 24px;
+            height: 24px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            opacity: 0;
+            transition: opacity 0.3s;
+            z-index: 2;
+        }
+        
+        .card:hover .remove-button {
+            opacity: 1;
+        }
+        
+        .modal-overlay {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0, 0, 0, 0.8);
+            z-index: 1000;
+            justify-content: center;
+            align-items: center;
+            backdrop-filter: blur(5px);
+        }
+        
+        .modal-overlay.active {
+            display: flex;
+        }
+        
+        .modal-content {
+            max-width: 90%;
+            max-height: 90vh;
+            border-radius: 20px;
+            overflow: hidden;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+        }
+        
+        .modal-content img {
+            max-width: 100%;
+            max-height: 90vh;
+            object-fit: contain;
+        }
+        
+        .card-buttons {
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            display: flex;
+            gap: 8px;
+            justify-content: center;
+            align-items: center;
+            background: rgba(0, 0, 0, 0.5);
+            opacity: 0;
+            transition: opacity 0.2s;
+            z-index: 2;
+        }
+        
+        .card:hover .card-buttons {
+            opacity: 1;
+        }
+        
+        .card-button {
+            width: 36px;
+            height: 36px;
+            border: 2px solid white;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            font-size: 18px;
+            color: white;
+            background: rgba(0, 0, 0, 0.5);
+            transition: transform 0.2s, background-color 0.2s;
+        }
+        
+        .card-button:hover {
+            transform: scale(1.1);
+        }
+        
+        .zoom-button {
+            background: rgba(76, 175, 80, 0.8);
+        }
+        
+        .zoom-button:hover {
+            background: rgba(76, 175, 80, 1);
+        }
+        
+        .remove-button {
+            background: rgba(255, 68, 68, 0.8);
+        }
+        
+        .remove-button:hover {
+            background: rgba(255, 68, 68, 1);
+        }
+        
+        .add-button {
+            background: rgba(61, 125, 202, 0.8);
+        }
+        
+        .add-button:hover {
+            background: rgba(61, 125, 202, 1);
+        }
+        
+        .deck-controls {
+            margin: 10px 0;
+            display: flex;
+            gap: 10px;
+        }
+        
+        .deck-controls button {
+            padding: 8px 16px;
+            border: none;
+            border-radius: 4px;
+            background-color: #4CAF50;
+            color: white;
+            cursor: pointer;
+        }
+        
+        .deck-controls button:hover {
+            background-color: #45a049;
+        }
+        
+        .energy-card {
+            border: 2px solid #ddd;
+            border-radius: 8px;
+            padding: 5px;
+        }
+        
+        .energy-card img {
+            width: 100%;
+            height: auto;
+            border-radius: 4px;
+        }
+        
+        .controls button {
+            padding: 8px 16px;
+            margin: 0 5px;
+            cursor: pointer;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            background-color: #fff;
+            transition: all 0.2s;
+        }
+        
+        .controls button:hover {
+            background-color: #f0f0f0;
+        }
+        
+        .controls button i {
+            margin-right: 5px;
+        }
+        
+        .button-container {
+            display: flex;
+            justify-content: flex-end;
+            gap: 10px;
+            margin: 10px;
+        }
+        
+        .button-container button {
+            padding: 12px;
+            border: none;
+            border-radius: 50%;
+            background-color: white;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-size: 1.2rem;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        }
+        
+        .button-container button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+        }
+        
+        .button-container button::after {
+            content: attr(data-label);
+            position: absolute;
+            top: 100%;
+            left: 50%;
+            transform: translateX(-50%);
+            padding: 4px 8px;
+            background-color: #333;
+            color: white;
+            border-radius: 4px;
+            font-size: 12px;
+            white-space: nowrap;
+            opacity: 0;
+            visibility: hidden;
+            transition: opacity 0.2s, visibility 0.2s;
+            margin-top: 5px;
+        }
+        
+        .button-container button:hover::after {
+            opacity: 1;
+            visibility: visible;
+        }
+        
+        .card-details {
+            background: white;
+            padding: 20px;
+            border-radius: 10px;
+            max-width: 600px;
+            max-height: 80vh;
+            overflow-y: auto;
+            color: #333;
+        }
+        
+        .card-details h2 {
+            margin-bottom: 20px;
+            color: #2a75bb;
+            border-bottom: 2px solid #ffcb05;
+            padding-bottom: 10px;
+        }
+        
+        .card-details h3 {
+            color: #2a75bb;
+            margin: 15px 0 10px 0;
+        }
+        
+        .details-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 10px;
+            margin-bottom: 20px;
+        }
+        
+        .detail-item {
+            padding: 8px;
+            background: #f5f5f5;
+            border-radius: 5px;
+        }
+        
+        .abilities-section, .attacks-section, .rules-section {
+            margin-top: 20px;
+        }
+        
+        .ability, .attack {
+            background: #f5f5f5;
+            padding: 10px;
+            margin: 10px 0;
+            border-radius: 5px;
+        }
+        
+        .ability p, .attack p {
+            margin: 5px 0;
+        }
+        
+        .details-button {
+            background: #4a90e2;
+        }
+        
+        .details-button:hover {
+            background: #357abd;
+        }
+        
+        .disclaimer {
+            background-color: rgba(0, 0, 0, 0.05);
+            padding: 10px;
+            margin: 10px 0;
+            border-radius: 5px;
+            font-size: 0.8em;
+            color: #666;
+            text-align: center;
+            line-height: 1.4;
+        } 
