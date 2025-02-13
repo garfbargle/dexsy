@@ -147,6 +147,7 @@
             aspect-ratio: 2.55/3.5;
             display: flex;
             flex-direction: column;
+            cursor: pointer;
         }
         
         .card:hover {
@@ -409,43 +410,31 @@
         
         .card-buttons {
             position: absolute;
-            top: 0;
-            left: 0;
-            right: 0;
-            bottom: 0;
-            padding: 5px;
-            display: flex;
-            gap: 8px;
-            justify-content: center;
-            align-items: center;
-            background: rgba(20, 20, 20, 0.4);
-            opacity: 0;
-            transition: opacity 0.2s;
+            bottom: 4px;
+            right: 4px;
             z-index: 2;
-        }
-        
-        .card:hover .card-buttons {
-            opacity: 1;
+            pointer-events: none;
         }
         
         .card-button {
-            width: 36px;
-            height: 36px;
-            border: 2px solid white;
-            border-radius: 50%;
+            width: 24px;
+            height: 24px;
+            border: none;
+            background: none;
             display: flex;
             align-items: center;
             justify-content: center;
             cursor: pointer;
-            font-size: 18px;
-            color: rgb(255, 255, 255);
-            background: linear-gradient(145deg, rgba(203, 203, 203, 0.8), rgba(130, 130, 130, 0.8));
-            transition: transform 0.2s, background 0.2s;
+            font-size: 16px;
+            padding: 4px;
+            margin: 0;
+            pointer-events: auto;
+            transition: transform 0.2s;
+            text-shadow: 0 0 4px rgba(0, 0, 0, 0.5);
         }
         
         .card-button:hover {
-            transform: scale(1.1);
-            background: linear-gradient(145deg, rgba(49, 49, 49, 0.9), rgba(55, 55, 55, 0.9));
+            transform: scale(1.2);
         }
         
         .deck-controls {

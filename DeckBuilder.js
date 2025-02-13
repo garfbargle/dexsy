@@ -66,12 +66,6 @@ class DeckBuilder {
     displaySearchResults(cards) {
         this.searchResults.innerHTML = '';
         cards.forEach(card => {
-            const buttons = [
-                {icon: '🔍', title: 'Zoom', handler: () => this.showCardModal(card.images.large || card.images.small)},
-                {icon: 'ℹ️', title: 'Show details', handler: () => this.showCardDetails(card)},
-                {icon: '✅', title: 'Add to deck', handler: () => this.addCardToDeck(card)}
-            ];
-
             const cardElement = document.createElement('div');
             cardElement.className = 'card';
             
@@ -87,23 +81,28 @@ class DeckBuilder {
             };
             actualImage.src = card.images.small;
 
-            cardElement.innerHTML = `
+            // Add button for adding to deck
+            const buttonsHTML = `
                 <div class="card-buttons">
-                    ${buttons.map(btn => `
-                        <button class="card-button" title="${btn.title}">${btn.icon}</button>
-                    `).join('')}
+                    <button class="card-button">✅</button>
                 </div>
             `;
             
-            // Insert the image at the beginning of the card element
+            cardElement.innerHTML = buttonsHTML;
             cardElement.insertBefore(img, cardElement.firstChild);
 
-            const buttonElements = cardElement.querySelectorAll('.card-button');
-            buttons.forEach((btn, i) => {
-                buttonElements[i].addEventListener('click', (e) => {
-                    e.stopPropagation();
-                    btn.handler();
-                });
+            // Add click handler for card zoom
+            cardElement.addEventListener('click', (e) => {
+                if (!e.target.classList.contains('card-button')) {
+                    this.showCardModal(card.images.large || card.images.small);
+                }
+            });
+
+            // Add click handler for add button
+            const addButton = cardElement.querySelector('.card-button');
+            addButton.addEventListener('click', (e) => {
+                e.stopPropagation();
+                this.addCardToDeck(card);
             });
 
             this.searchResults.appendChild(cardElement);
@@ -120,41 +119,36 @@ class DeckBuilder {
         this.deckDisplay.innerHTML = '';
         this.deck.forEach((card, index) => {
             const cardElement = document.createElement('div');
-            cardElement.className = `card ${card.energy ? 'energy-card' : ''}`;
+            cardElement.className = 'card';
 
-            if (card.energy) {
-                cardElement.innerHTML = `
-                    <img src="${card.images.small}" alt="${card.name}">
-                    <div class="card-info">
-                        <h3>${card.name}</h3>
-                        <p>Energy</p>
-                    </div>
-                `;
-            } else {
-                const buttons = [
-                    {icon: '🔍', title: 'Zoom', handler: () => this.showCardModal(card.images.large || card.images.small)},
-                    {icon: 'ℹ️', title: 'Show details', handler: () => this.showCardDetails(card)},
-                    {icon: '🗑️', title: 'Remove from deck', handler: () => this.removeCardFromDeck(index)}
-                ];
+            const img = document.createElement('img');
+            img.src = card.images.small;
+            img.alt = card.name;
 
-                cardElement.innerHTML = `
-                    <img src="${card.images.small}" alt="${card.name}">
-                    <div class="card-buttons">
-                        ${buttons.map(btn => `
-                            <button class="card-button" title="${btn.title}">${btn.icon}</button>
-                        `).join('')}
-                    </div>
-                `;
+            // Add button for removing from deck
+            const buttonsHTML = `
+                <div class="card-buttons">
+                    <button class="card-button">❌</button>
+                </div>
+            `;
 
-                const buttonElements = cardElement.querySelectorAll('.card-button');
-                buttons.forEach((btn, i) => {
-                    buttonElements[i].addEventListener('click', (e) => {
-                        e.stopPropagation();
-                        btn.handler();
-                    });
-                });
-            }
-            
+            cardElement.innerHTML = buttonsHTML;
+            cardElement.insertBefore(img, cardElement.firstChild);
+
+            // Add click handler for card zoom
+            cardElement.addEventListener('click', (e) => {
+                if (!e.target.classList.contains('card-button')) {
+                    this.showCardModal(card.images.large || card.images.small);
+                }
+            });
+
+            // Add click handler for remove button
+            const removeButton = cardElement.querySelector('.card-button');
+            removeButton.addEventListener('click', (e) => {
+                e.stopPropagation();
+                this.removeCardFromDeck(index);
+            });
+
             this.deckDisplay.appendChild(cardElement);
         });
     }
@@ -210,60 +204,6 @@ class DeckBuilder {
 
     showCardModal(imageUrl) {
         this.modalContent.innerHTML = `<img src="${imageUrl}" alt="Card preview">`;
-        this.modalOverlay.classList.add('active');
-    }
-
-    showCardDetails(card) {
-        const sections = [
-            {
-                title: null,
-                items: [
-                    ['Type', card.supertype],
-                    ['Subtypes', card.subtypes?.join(', ')],
-                    ['HP', card.hp],
-                    ['Types', card.types?.join(', ')],
-                    ['Evolves From', card.evolvesFrom]
-                ]
-            },
-            {
-                title: 'Abilities',
-                items: card.abilities?.map(a => [`${a.name}`, a.text])
-            },
-            {
-                title: 'Attacks',
-                items: card.attacks?.map(a => [`${a.name}`, `Damage: ${a.damage || '0'}\n${a.text || ''}`])
-            },
-            {
-                title: 'Rules',
-                items: card.rules?.map(r => [null, r])
-            }
-        ];
-
-        const detailsHTML = `
-            <div class="card-details">
-                <h2>${card.name}</h2>
-                ${sections.map(section => {
-                    if (!section.items?.length) return '';
-                    
-                    const content = section.items
-                        .filter(([label, value]) => value)
-                        .map(([label, value]) => `
-                            <div class="${section.title ? section.title.toLowerCase() : 'detail-item'}">
-                                ${label ? `<strong>${label}:</strong> ` : ''}${value}
-                            </div>
-                        `).join('');
-                        
-                    return content ? `
-                        ${section.title ? `<h3>${section.title}</h3>` : ''}
-                        <div class="${section.title ? `${section.title.toLowerCase()}-section` : 'details-grid'}">
-                            ${content}
-                        </div>
-                    ` : '';
-                }).join('')}
-            </div>
-        `;
-
-        this.modalContent.innerHTML = detailsHTML;
         this.modalOverlay.classList.add('active');
     }
 
