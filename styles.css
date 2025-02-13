@@ -281,15 +281,11 @@
             padding: 0.5rem;
             border: none;
             border-radius: 5px;
-            background-color: var(--primary-color);
             color: white;
             cursor: pointer;
             transition: background-color 0.3s;
         }
         
-        .card button.selected {
-            background-color: var(--secondary-color);
-        }
         
         .trainer-pack {
             background: white;
@@ -417,11 +413,12 @@
             left: 0;
             right: 0;
             bottom: 0;
+            padding: 5px;
             display: flex;
             gap: 8px;
             justify-content: center;
             align-items: center;
-            background: rgba(0, 0, 0, 0.5);
+            background: rgba(20, 20, 20, 0.4);
             opacity: 0;
             transition: opacity 0.2s;
             z-index: 2;
@@ -441,37 +438,14 @@
             justify-content: center;
             cursor: pointer;
             font-size: 18px;
-            color: white;
-            background: rgba(0, 0, 0, 0.5);
-            transition: transform 0.2s, background-color 0.2s;
+            color: rgb(255, 255, 255);
+            background: linear-gradient(145deg, rgba(203, 203, 203, 0.8), rgba(130, 130, 130, 0.8));
+            transition: transform 0.2s, background 0.2s;
         }
         
         .card-button:hover {
             transform: scale(1.1);
-        }
-        
-        .zoom-button {
-            background: rgba(76, 175, 80, 0.8);
-        }
-        
-        .zoom-button:hover {
-            background: rgba(76, 175, 80, 1);
-        }
-        
-        .remove-button {
-            background: rgba(255, 68, 68, 0.8);
-        }
-        
-        .remove-button:hover {
-            background: rgba(255, 68, 68, 1);
-        }
-        
-        .add-button {
-            background: rgba(61, 125, 202, 0.8);
-        }
-        
-        .add-button:hover {
-            background: rgba(61, 125, 202, 1);
+            background: linear-gradient(145deg, rgba(49, 49, 49, 0.9), rgba(55, 55, 55, 0.9));
         }
         
         .deck-controls {
