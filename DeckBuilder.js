@@ -9,6 +9,9 @@ class DeckBuilder {
 
         // Add export/import buttons to event listeners
         this.setupExportImport();
+
+        this.cardBackUrl = null;
+        this.fetchCardBack();
     }
 
     initializeElements() {
@@ -46,6 +49,18 @@ class DeckBuilder {
         }
     }
 
+    async fetchCardBack() {
+        try {
+            const response = await fetch('https://api.pokemontcg.io/v2/cards?q=!name:"Card Back"');
+            const data = await response.json();
+            const cardBack = data.data.find(card => card.name === 'Card Back');
+            this.cardBackUrl = cardBack?.images?.small || 'https://images.pokemontcg.io/cardback.png';
+        } catch (error) {
+            console.error('Error fetching card back:', error);
+            this.cardBackUrl = 'https://images.pokemontcg.io/cardback.png'; // Fallback URL
+        }
+    }
+
     displaySearchResults(cards) {
         this.searchResults.innerHTML = '';
         cards.forEach(card => {
@@ -57,14 +72,29 @@ class DeckBuilder {
 
             const cardElement = document.createElement('div');
             cardElement.className = 'card';
+            
+            // Create image element with card back as placeholder
+            const img = document.createElement('img');
+            img.src = this.cardBackUrl;
+            img.alt = card.name;
+
+            // Load the actual card image
+            const actualImage = new Image();
+            actualImage.onload = () => {
+                img.src = actualImage.src;
+            };
+            actualImage.src = card.images.small;
+
             cardElement.innerHTML = `
-                <img src="${card.images.small}" alt="${card.name}">
                 <div class="card-buttons">
                     ${buttons.map(btn => `
                         <button class="card-button" title="${btn.title}">${btn.icon}</button>
                     `).join('')}
                 </div>
             `;
+            
+            // Insert the image at the beginning of the card element
+            cardElement.insertBefore(img, cardElement.firstChild);
 
             const buttonElements = cardElement.querySelectorAll('.card-button');
             buttons.forEach((btn, i) => {
