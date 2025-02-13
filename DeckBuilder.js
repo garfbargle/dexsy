@@ -1,6 +1,7 @@
 class DeckBuilder {
     constructor() {
         this.deck = [];
+        this.removedCards = [];  // Track removed cards for undo
         this.initializeElements();
         this.setupEventListeners();
         
@@ -36,6 +37,12 @@ class DeckBuilder {
                 this.searchCards();
             }
         });
+        
+        // Add undo button listener
+        const undoBtn = document.getElementById('undoBtn');
+        if (undoBtn) {
+            undoBtn.addEventListener('click', () => this.undoCardRemoval());
+        }
     }
 
     async searchCards() {
@@ -197,9 +204,16 @@ class DeckBuilder {
     }
 
     removeCardFromDeck(index) {
-        this.deck.splice(index, 1);
+        const removedCard = this.deck.splice(index, 1)[0];
+        this.removedCards.push(removedCard);  // Store removed card
         this.updateDeckDisplay();
         this.updateCounters();
+        
+        // Show undo button if we have removed cards
+        const undoBtn = document.getElementById('undoBtn');
+        if (undoBtn) {
+            undoBtn.style.display = this.removedCards.length > 0 ? 'block' : 'none';
+        }
     }
 
     showCardModal(imageUrl) {
@@ -361,6 +375,22 @@ class DeckBuilder {
             <div class="back"></div>
         `;
         return cardElement;
+    }
+
+    // Add new method for undo functionality
+    undoCardRemoval() {
+        if (this.removedCards.length > 0) {
+            const cardToRestore = this.removedCards.pop();
+            this.deck.push(cardToRestore);
+            this.updateDeckDisplay();
+            this.updateCounters();
+            
+            // Hide undo button if no more cards to restore
+            const undoBtn = document.getElementById('undoBtn');
+            if (undoBtn && this.removedCards.length === 0) {
+                undoBtn.style.display = 'none';
+            }
+        }
     }
 }
 
