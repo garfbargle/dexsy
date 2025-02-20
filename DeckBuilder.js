@@ -21,6 +21,9 @@ class DeckBuilder {
         this.isLoading = false;
         this.hasMoreResults = true;
         this.lastSearchQuery = '';
+
+        // Add initial search for Base Set
+        this.initialBaseSetSearch();
     }
 
     initializeElements() {
@@ -518,6 +521,14 @@ class DeckBuilder {
         } catch (error) {
             console.error('Error loading set suggestions:', error);
         }
+    }
+
+    // Add new method for initial Base Set search
+    initialBaseSetSearch() {
+        // Set the search input value to "base1"
+        this.searchInput.value = "base1";
+        // Trigger the search
+        this.searchCards();
     }
 }
 
