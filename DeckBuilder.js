@@ -229,6 +229,27 @@ class DeckBuilder {
         this.updateSortButtonVisibility();
     }
 
+    // Add new method to increase card quantity
+    increaseCardQuantity(card) {
+        this.deck.push(card);
+        this.updateDeckDisplay();
+        this.updateCounters();
+    }
+
+    // Add new method to decrease card quantity
+    decreaseCardQuantity(card) {
+        // Find the last instance of this card in the deck
+        const index = this.deck.findIndex(c => 
+            c.name === card.name && 
+            c.number === card.number && 
+            c.set.id === card.set.id
+        );
+        
+        if (index !== -1) {
+            this.removeCardFromDeck(index);
+        }
+    }
+
     updateDeckDisplay() {
         this.deckDisplay.innerHTML = '';
         
@@ -258,25 +279,24 @@ class DeckBuilder {
             img.src = card.images.small;
             img.alt = card.name;
 
-            // Add count badge if more than 1
+            // Add count badge
             const count = cardCounts.get(cardKey);
             const countBadge = document.createElement('div');
             countBadge.className = 'card-count';
             countBadge.textContent = `×${count}`;
 
-            // Add buttons for removing from deck and TCGPlayer
+            // Add buttons for quantity control and TCGPlayer
             const buttonsHTML = `
                 <div class="card-buttons">
-                    <button class="card-button" title="Remove from deck">✖️</button>
+                    <button class="card-button decrease-button" title="Decrease quantity">➖</button>
+                    <button class="card-button increase-button" title="Increase quantity">➕</button>
                     <button class="card-button tcgplayer-button" title="View on TCGPlayer">💰</button>
                 </div>
             `;
 
             cardElement.innerHTML = buttonsHTML;
             cardElement.insertBefore(img, cardElement.firstChild);
-            if (count > 1) {
-                cardElement.appendChild(countBadge);
-            }
+            cardElement.appendChild(countBadge);
 
             // Add click handler for card zoom
             cardElement.addEventListener('click', (e) => {
@@ -285,19 +305,18 @@ class DeckBuilder {
                 }
             });
 
-            // Add click handler for remove button
-            const removeButton = cardElement.querySelector('.card-button:not(.tcgplayer-button)');
-            removeButton.addEventListener('click', (e) => {
+            // Add click handler for decrease button
+            const decreaseButton = cardElement.querySelector('.decrease-button');
+            decreaseButton.addEventListener('click', (e) => {
                 e.stopPropagation();
-                // Find the last instance of this card in the deck (to maintain order)
-                const index = this.deck.findIndex(c => 
-                    c.name === card.name && 
-                    c.number === card.number && 
-                    c.set.id === card.set.id
-                );
-                if (index !== -1) {
-                    this.removeCardFromDeck(index);
-                }
+                this.decreaseCardQuantity(card);
+            });
+
+            // Add click handler for increase button
+            const increaseButton = cardElement.querySelector('.increase-button');
+            increaseButton.addEventListener('click', (e) => {
+                e.stopPropagation();
+                this.increaseCardQuantity(card);
             });
 
             // Add click handler for TCGPlayer button

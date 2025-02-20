@@ -462,10 +462,10 @@
             pointer-events: none;
             background: rgba(255, 255, 255, 0.9);
             border-radius: 12px;
-            padding: 2px;
+            padding: 4px;
             box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
             display: flex;
-            gap: 2px;
+            gap: 4px;
         }
         
         .card-button {
@@ -477,7 +477,7 @@
             align-items: center;
             justify-content: center;
             cursor: pointer;
-            font-size: 18px;
+            font-size: 16px;
             padding: 4px;
             margin: 0;
             pointer-events: auto;
@@ -492,14 +492,48 @@
             background: rgba(255, 255, 255, 0.95);
         }
         
+        .card-button.decrease-button {
+            color: #e74c3c;
+        }
+        
+        .card-button.increase-button {
+            color: #2ecc71;
+        }
+        
         .card-button.tcgplayer-button {
             color: #0a5;
             font-size: 16px;
+            border-left: 1px solid rgba(0, 0, 0, 0.1);
+            padding-left: 8px;
         }
         
         .card-button.tcgplayer-button:hover {
             color: #0c6;
             background: rgba(0, 204, 102, 0.1);
+        }
+        
+        .card-count {
+            position: absolute;
+            top: 8px;
+            right: 8px;
+            background: rgba(0, 0, 0, 0.8);
+            color: white;
+            padding: 4px 8px;
+            border-radius: 12px;
+            font-size: 14px;
+            font-weight: bold;
+            z-index: 3;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            min-width: 32px;
+        }
+        
+        .card:hover .card-count {
+            background: rgba(0, 0, 0, 0.95);
+            transform: scale(1.1);
+            transition: all 0.2s ease;
         }
         
         .deck-controls {
@@ -858,24 +892,4 @@
             0% { opacity: 0.6; }
             50% { opacity: 1; }
             100% { opacity: 0.6; }
-        }
-        
-        .card-count {
-            position: absolute;
-            top: 10px;
-            right: 10px;
-            background: rgba(0, 0, 0, 0.8);
-            color: white;
-            padding: 4px 8px;
-            border-radius: 12px;
-            font-size: 16px;
-            font-weight: bold;
-            z-index: 3;
-            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
-        }
-        
-        .card:hover .card-count {
-            background: rgba(0, 0, 0, 0.95);
-            transform: scale(1.1);
-            transition: all 0.2s ease;
         } 
