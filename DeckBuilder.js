@@ -24,6 +24,9 @@ class DeckBuilder {
 
         // Add initial search for Base Set
         this.initialBaseSetSearch();
+
+        // Initialize sort button visibility
+        this.updateSortButtonVisibility();
     }
 
     initializeElements() {
@@ -68,6 +71,12 @@ class DeckBuilder {
                 this.loadMoreCards();
             }
         });
+
+        // Add sort button listener
+        const sortBtn = document.getElementById('sortBtn');
+        if (sortBtn) {
+            sortBtn.addEventListener('click', () => this.sortDeck());
+        }
     }
 
     async searchCards() {
@@ -209,6 +218,7 @@ class DeckBuilder {
         this.deck.push(card);
         this.updateDeckDisplay();
         this.updateCounters();
+        this.updateSortButtonVisibility();
     }
 
     updateDeckDisplay() {
@@ -283,6 +293,8 @@ class DeckBuilder {
 
             this.deckDisplay.appendChild(cardElement);
         });
+
+        this.updateSortButtonVisibility();
     }
 
     updateCounters() {
@@ -571,6 +583,46 @@ class DeckBuilder {
         // Trigger the search
         this.searchCards();
     }
+
+    // Add new method for sorting the deck
+    sortDeck() {
+        // Define sort order for supertypes
+        const typeOrder = {
+            'pokémon': 1,
+            'pokemon': 1,  // Handle both forms of spelling
+            'trainer': 2,
+            'energy': 3
+        };
+
+        // Sort the deck array
+        this.deck.sort((a, b) => {
+            const typeA = (a.supertype || '').toLowerCase();
+            const typeB = (b.supertype || '').toLowerCase();
+            
+            // Get order values (default to highest number if type not found)
+            const orderA = typeOrder[typeA] || 999;
+            const orderB = typeOrder[typeB] || 999;
+            
+            // Sort by type order first
+            if (orderA !== orderB) {
+                return orderA - orderB;
+            }
+            
+            // Within same type, sort by name
+            return a.name.localeCompare(b.name);
+        });
+
+        // Update the display
+        this.updateDeckDisplay();
+    }
+
+    // Add new method to handle sort button visibility
+    updateSortButtonVisibility() {
+        const sortBtn = document.getElementById('sortBtn');
+        if (sortBtn) {
+            sortBtn.style.display = this.deck.length > 0 ? 'block' : 'none';
+        }
+    }
 }
 
 // Initialize the deck builder when the page loads
@@ -582,6 +634,7 @@ document.addEventListener('DOMContentLoaded', () => {
             deckBuilder.deck = [];
             deckBuilder.updateDeckDisplay();
             deckBuilder.updateCounters();
+            deckBuilder.updateSortButtonVisibility();
         }
     });
 }); 
