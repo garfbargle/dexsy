@@ -131,6 +131,7 @@
             border-radius: 8px;
             box-shadow: 0 2px 4px rgba(0,0,0,0.1);
             grid-auto-rows: 1fr;
+            min-height: 100px;
         }
         
         .card {
@@ -775,4 +776,14 @@
             0%, 100% { transform: rotate(0deg); }
             25% { transform: rotate(-5deg) translateX(-10px); }
             75% { transform: rotate(5deg) translateX(10px); }
+        }
+        
+        .loading-indicator {
+            display: none;
+        }
+        
+        @keyframes pulse {
+            0% { opacity: 0.6; }
+            50% { opacity: 1; }
+            100% { opacity: 0.6; }
         } 

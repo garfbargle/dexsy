@@ -15,6 +15,12 @@ class DeckBuilder {
         this.fetchCardBack();
 
         this.initializeGameElements();
+
+        // Add pagination tracking
+        this.currentPage = 1;
+        this.isLoading = false;
+        this.hasMoreResults = true;
+        this.lastSearchQuery = '';
     }
 
     initializeElements() {
@@ -43,18 +49,64 @@ class DeckBuilder {
         if (undoBtn) {
             undoBtn.addEventListener('click', () => this.undoCardRemoval());
         }
+
+        // Add scroll event listener for infinite scrolling
+        window.addEventListener('scroll', () => {
+            if (this.isLoading || !this.hasMoreResults) return;
+
+            const scrollPosition = window.innerHeight + window.scrollY;
+            const scrollThreshold = document.documentElement.scrollHeight - 200;
+
+            if (scrollPosition >= scrollThreshold) {
+                this.loadMoreCards();
+            }
+        });
     }
 
     async searchCards() {
         const query = this.searchInput.value.trim();
         if (!query) return;
 
+        // Reset pagination when starting a new search
+        this.currentPage = 1;
+        this.hasMoreResults = true;
+        this.lastSearchQuery = query;
+        this.searchResults.innerHTML = '';
+
         try {
-            const response = await fetch(`https://api.pokemontcg.io/v2/cards?q=name:"${query}"&pageSize=20`);
+            this.isLoading = true;
+            const response = await fetch(`https://api.pokemontcg.io/v2/cards?q=name:"${query}"&page=${this.currentPage}&pageSize=20`);
             const data = await response.json();
-            this.displaySearchResults(data.data);
+            
+            // Check if we have more results
+            this.hasMoreResults = data.data.length === 20;
+            
+            this.displaySearchResults(data.data, false);
         } catch (error) {
             console.error('Error searching cards:', error);
+        } finally {
+            this.isLoading = false;
+        }
+    }
+
+    async loadMoreCards() {
+        if (this.isLoading || !this.hasMoreResults) return;
+
+        try {
+            this.isLoading = true;
+            this.currentPage++;
+
+            const response = await fetch(`https://api.pokemontcg.io/v2/cards?q=name:"${this.lastSearchQuery}"&page=${this.currentPage}&pageSize=20`);
+            const data = await response.json();
+
+            // Check if we have more results
+            this.hasMoreResults = data.data.length === 20;
+
+            this.displaySearchResults(data.data, true);
+        } catch (error) {
+            console.error('Error loading more cards:', error);
+        } finally {
+            this.isLoading = false;
         }
     }
 
@@ -70,8 +122,17 @@ class DeckBuilder {
         }
     }
 
-    displaySearchResults(cards) {
-        this.searchResults.innerHTML = '';
+    displaySearchResults(cards, append = false) {
+        // Remove any existing loading indicator before adding new cards
+        const existingLoadingIndicator = this.searchResults.querySelector('.loading-indicator');
+        if (existingLoadingIndicator) {
+            existingLoadingIndicator.remove();
+        }
+
+        if (!append) {
+            this.searchResults.innerHTML = '';
+        }
+
         cards.forEach(card => {
             const cardElement = document.createElement('div');
             cardElement.className = 'card';
