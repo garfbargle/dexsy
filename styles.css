@@ -464,6 +464,8 @@
             border-radius: 12px;
             padding: 2px;
             box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+            display: flex;
+            gap: 2px;
         }
         
         .card-button {
@@ -481,11 +483,23 @@
             pointer-events: auto;
             transition: transform 0.2s, opacity 0.2s;
             opacity: 0.85;
+            border-radius: 8px;
         }
         
         .card-button:hover {
             transform: scale(1.2);
             opacity: 1;
+            background: rgba(255, 255, 255, 0.95);
+        }
+        
+        .card-button.tcgplayer-button {
+            color: #0a5;
+            font-size: 16px;
+        }
+        
+        .card-button.tcgplayer-button:hover {
+            color: #0c6;
+            background: rgba(0, 204, 102, 0.1);
         }
         
         .deck-controls {

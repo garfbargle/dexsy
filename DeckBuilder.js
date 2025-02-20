@@ -186,10 +186,11 @@ class DeckBuilder {
             };
             actualImage.src = card.images.small;
 
-            // Add button for adding to deck
+            // Add buttons for adding to deck and TCGPlayer
             const buttonsHTML = `
                 <div class="card-buttons">
                     <button class="card-button" title="Add to deck">➕</button>
+                    <button class="card-button tcgplayer-button" title="View on TCGPlayer">💰</button>
                 </div>
             `;
             
@@ -204,10 +205,17 @@ class DeckBuilder {
             });
 
             // Add click handler for add button
-            const addButton = cardElement.querySelector('.card-button');
+            const addButton = cardElement.querySelector('.card-button:not(.tcgplayer-button)');
             addButton.addEventListener('click', (e) => {
                 e.stopPropagation();
                 this.addCardToDeck(card);
+            });
+
+            // Add click handler for TCGPlayer button
+            const tcgPlayerButton = cardElement.querySelector('.tcgplayer-button');
+            tcgPlayerButton.addEventListener('click', (e) => {
+                e.stopPropagation();
+                this.openTCGPlayer(card);
             });
 
             this.searchResults.appendChild(cardElement);
@@ -256,10 +264,11 @@ class DeckBuilder {
             countBadge.className = 'card-count';
             countBadge.textContent = `×${count}`;
 
-            // Add button for removing from deck
+            // Add buttons for removing from deck and TCGPlayer
             const buttonsHTML = `
                 <div class="card-buttons">
                     <button class="card-button" title="Remove from deck">✖️</button>
+                    <button class="card-button tcgplayer-button" title="View on TCGPlayer">💰</button>
                 </div>
             `;
 
@@ -277,7 +286,7 @@ class DeckBuilder {
             });
 
             // Add click handler for remove button
-            const removeButton = cardElement.querySelector('.card-button');
+            const removeButton = cardElement.querySelector('.card-button:not(.tcgplayer-button)');
             removeButton.addEventListener('click', (e) => {
                 e.stopPropagation();
                 // Find the last instance of this card in the deck (to maintain order)
@@ -289,6 +298,13 @@ class DeckBuilder {
                 if (index !== -1) {
                     this.removeCardFromDeck(index);
                 }
+            });
+
+            // Add click handler for TCGPlayer button
+            const tcgPlayerButton = cardElement.querySelector('.tcgplayer-button');
+            tcgPlayerButton.addEventListener('click', (e) => {
+                e.stopPropagation();
+                this.openTCGPlayer(card);
             });
 
             this.deckDisplay.appendChild(cardElement);
@@ -650,6 +666,14 @@ class DeckBuilder {
         if (sortBtn) {
             sortBtn.style.display = this.deck.length > 0 ? 'block' : 'none';
         }
+    }
+
+    // Add new method to handle opening TCGPlayer
+    openTCGPlayer(card) {
+        // Construct the TCGPlayer search URL using just name and set
+        const searchQuery = encodeURIComponent(`${card.name} ${card.set.name}`);
+        const tcgPlayerUrl = `https://www.tcgplayer.com/search/pokemon/${card.set.name.toLowerCase()}?q=${searchQuery}&productLineName=pokemon`;
+        window.open(tcgPlayerUrl, '_blank');
     }
 }
 
