@@ -213,13 +213,38 @@ class DeckBuilder {
 
     updateDeckDisplay() {
         this.deckDisplay.innerHTML = '';
-        this.deck.forEach((card, index) => {
+        
+        // Create a map to count duplicate cards using a composite key
+        const cardCounts = new Map();
+        this.deck.forEach(card => {
+            // Create a unique key using name and set number
+            const cardKey = `${card.name}-${card.number}-${card.set.id}`;
+            cardCounts.set(cardKey, (cardCounts.get(cardKey) || 0) + 1);
+        });
+
+        // Create a map of unique cards
+        const uniqueCards = new Map();
+        this.deck.forEach(card => {
+            const cardKey = `${card.name}-${card.number}-${card.set.id}`;
+            if (!uniqueCards.has(cardKey)) {
+                uniqueCards.set(cardKey, card);
+            }
+        });
+
+        // Display unique cards with count
+        uniqueCards.forEach((card, cardKey) => {
             const cardElement = document.createElement('div');
             cardElement.className = 'card';
 
             const img = document.createElement('img');
             img.src = card.images.small;
             img.alt = card.name;
+
+            // Add count badge if more than 1
+            const count = cardCounts.get(cardKey);
+            const countBadge = document.createElement('div');
+            countBadge.className = 'card-count';
+            countBadge.textContent = `×${count}`;
 
             // Add button for removing from deck
             const buttonsHTML = `
@@ -230,6 +255,9 @@ class DeckBuilder {
 
             cardElement.innerHTML = buttonsHTML;
             cardElement.insertBefore(img, cardElement.firstChild);
+            if (count > 1) {
+                cardElement.appendChild(countBadge);
+            }
 
             // Add click handler for card zoom
             cardElement.addEventListener('click', (e) => {
@@ -242,7 +270,13 @@ class DeckBuilder {
             const removeButton = cardElement.querySelector('.card-button');
             removeButton.addEventListener('click', (e) => {
                 e.stopPropagation();
-                this.removeCardFromDeck(index);
+                // Remove one instance of the card
+                const index = this.deck.findIndex(c => 
+                    `${c.name}-${c.number}-${c.set.id}` === cardKey
+                );
+                if (index !== -1) {
+                    this.removeCardFromDeck(index);
+                }
             });
 
             this.deckDisplay.appendChild(cardElement);

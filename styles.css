@@ -791,4 +791,24 @@
             0% { opacity: 0.6; }
             50% { opacity: 1; }
             100% { opacity: 0.6; }
+        }
+        
+        .card-count {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            background: rgba(0, 0, 0, 0.8);
+            color: white;
+            padding: 4px 8px;
+            border-radius: 12px;
+            font-size: 16px;
+            font-weight: bold;
+            z-index: 3;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+        }
+        
+        .card:hover .card-count {
+            background: rgba(0, 0, 0, 0.95);
+            transform: scale(1.1);
+            transition: all 0.2s ease;
         } 
