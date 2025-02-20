@@ -180,7 +180,7 @@ class DeckBuilder {
             // Add button for adding to deck
             const buttonsHTML = `
                 <div class="card-buttons">
-                    <button class="card-button">✅</button>
+                    <button class="card-button" title="Add to deck">➕</button>
                 </div>
             `;
             
@@ -224,7 +224,7 @@ class DeckBuilder {
             // Add button for removing from deck
             const buttonsHTML = `
                 <div class="card-buttons">
-                    <button class="card-button">❌</button>
+                    <button class="card-button" title="Remove from deck">✖️</button>
                 </div>
             `;
 

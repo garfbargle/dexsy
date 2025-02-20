@@ -411,31 +411,36 @@
         
         .card-buttons {
             position: absolute;
-            bottom: 4px;
-            right: 4px;
+            bottom: 8px;
+            right: 8px;
             z-index: 2;
             pointer-events: none;
+            background: rgba(255, 255, 255, 0.9);
+            border-radius: 12px;
+            padding: 2px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
         }
         
         .card-button {
-            width: 24px;
-            height: 24px;
+            width: 28px;
+            height: 28px;
             border: none;
             background: none;
             display: flex;
             align-items: center;
             justify-content: center;
             cursor: pointer;
-            font-size: 16px;
+            font-size: 18px;
             padding: 4px;
             margin: 0;
             pointer-events: auto;
-            transition: transform 0.2s;
-            text-shadow: 0 0 4px rgba(0, 0, 0, 0.5);
+            transition: transform 0.2s, opacity 0.2s;
+            opacity: 0.85;
         }
         
         .card-button:hover {
             transform: scale(1.2);
+            opacity: 1;
         }
         
         .deck-controls {
