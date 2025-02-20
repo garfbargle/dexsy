@@ -214,25 +214,25 @@ class DeckBuilder {
     updateDeckDisplay() {
         this.deckDisplay.innerHTML = '';
         
-        // Create a map to count duplicate cards using a composite key
+        // Create a map to count duplicate cards and track their first occurrence
         const cardCounts = new Map();
-        this.deck.forEach(card => {
-            // Create a unique key using name and set number
+        const firstOccurrence = new Map();
+        
+        // First pass: count cards and record first occurrence
+        this.deck.forEach((card, index) => {
             const cardKey = `${card.name}-${card.number}-${card.set.id}`;
             cardCounts.set(cardKey, (cardCounts.get(cardKey) || 0) + 1);
-        });
-
-        // Create a map of unique cards
-        const uniqueCards = new Map();
-        this.deck.forEach(card => {
-            const cardKey = `${card.name}-${card.number}-${card.set.id}`;
-            if (!uniqueCards.has(cardKey)) {
-                uniqueCards.set(cardKey, card);
+            if (!firstOccurrence.has(cardKey)) {
+                firstOccurrence.set(cardKey, { card, index });
             }
         });
 
-        // Display unique cards with count
-        uniqueCards.forEach((card, cardKey) => {
+        // Sort by the original order of first appearance
+        const sortedCards = Array.from(firstOccurrence.entries())
+            .sort((a, b) => a[1].index - b[1].index);
+
+        // Display cards in their original order
+        sortedCards.forEach(([cardKey, { card }]) => {
             const cardElement = document.createElement('div');
             cardElement.className = 'card';
 
@@ -270,9 +270,11 @@ class DeckBuilder {
             const removeButton = cardElement.querySelector('.card-button');
             removeButton.addEventListener('click', (e) => {
                 e.stopPropagation();
-                // Remove one instance of the card
+                // Find the last instance of this card in the deck (to maintain order)
                 const index = this.deck.findIndex(c => 
-                    `${c.name}-${c.number}-${c.set.id}` === cardKey
+                    c.name === card.name && 
+                    c.number === card.number && 
+                    c.set.id === card.set.id
                 );
                 if (index !== -1) {
                     this.removeCardFromDeck(index);
@@ -327,8 +329,13 @@ class DeckBuilder {
     }
 
     removeCardFromDeck(index) {
-        const removedCard = this.deck.splice(index, 1)[0];
-        this.removedCards.push(removedCard);  // Store removed card
+        // Store the removed card for undo
+        const removedCard = this.deck[index];
+        this.removedCards.push(removedCard);
+        
+        // Remove only the card at the specified index
+        this.deck.splice(index, 1);
+        
         this.updateDeckDisplay();
         this.updateCounters();
         
