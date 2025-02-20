@@ -11,8 +11,8 @@ class DeckBuilder {
         // Add export/import buttons to event listeners
         this.setupExportImport();
 
-        this.cardBackUrl = null;
-        this.fetchCardBack();
+        // Set default card back URL
+        this.cardBackUrl = 'https://images.pokemontcg.io/cardback.png';
 
         this.initializeGameElements();
 
@@ -25,6 +25,7 @@ class DeckBuilder {
 
     initializeElements() {
         this.searchInput = document.getElementById('search-input');
+        this.searchInput.placeholder = '🔍 Search by name, set (sv1 or Scarlet & Violet), or card number (sv1-1)';
         this.searchButton = document.getElementById('search-button');
         this.searchResults = document.getElementById('search-results');
         this.deckDisplay = document.getElementById('deck-display');
@@ -34,6 +35,9 @@ class DeckBuilder {
             energy: document.getElementById('energy-count'),
             trainer: document.getElementById('trainer-count')
         };
+        
+        // Add datalist for set suggestions
+        this.createSetSuggestions();
     }
 
     setupEventListeners() {
@@ -75,7 +79,27 @@ class DeckBuilder {
 
         try {
             this.isLoading = true;
-            const response = await fetch(`https://api.pokemontcg.io/v2/cards?q=name:"${query}"&page=${this.currentPage}&pageSize=20`);
+            
+            // Build the search query
+            let searchQuery;
+            
+            // Check if it's a set number search (e.g. "swsh1-1", "base1-4")
+            if (query.match(/^[a-zA-Z0-9]+-\d+$/)) {
+                searchQuery = `number:"${query.split('-')[1]}" set.id:"${query.split('-')[0]}"`;
+            }
+            // Check if it's a set ID without card number (e.g. "sv1", "swsh1")
+            else if (query.match(/^[a-zA-Z0-9]+$/)) {
+                searchQuery = `set.id:"${query}"`;
+            }
+            // Check if it looks like a set name or series name
+            else {
+                // Make the search more flexible by using contains
+                searchQuery = `(set.name:"*${query}*" OR set.series:"*${query}*")`;
+            }
+
+            const response = await fetch(
+                `https://api.pokemontcg.io/v2/cards?q=${searchQuery}&page=${this.currentPage}&pageSize=20`
+            );
             const data = await response.json();
             
             // Check if we have more results
@@ -96,29 +120,30 @@ class DeckBuilder {
             this.isLoading = true;
             this.currentPage++;
 
-            const response = await fetch(`https://api.pokemontcg.io/v2/cards?q=name:"${this.lastSearchQuery}"&page=${this.currentPage}&pageSize=20`);
+            const query = this.lastSearchQuery;
+            let searchQuery;
+            
+            if (query.match(/^[a-zA-Z0-9]+-\d+$/)) {
+                searchQuery = `number:"${query.split('-')[1]}" set.id:"${query.split('-')[0]}"`;
+            }
+            else if (query.match(/^[a-zA-Z0-9]+$/)) {
+                searchQuery = `set.id:"${query}"`;
+            }
+            else {
+                searchQuery = `(set.name:"*${query}*" OR set.series:"*${query}*")`;
+            }
+
+            const response = await fetch(
+                `https://api.pokemontcg.io/v2/cards?q=${searchQuery}&page=${this.currentPage}&pageSize=20`
+            );
             const data = await response.json();
 
-            // Check if we have more results
             this.hasMoreResults = data.data.length === 20;
-
             this.displaySearchResults(data.data, true);
         } catch (error) {
             console.error('Error loading more cards:', error);
         } finally {
             this.isLoading = false;
-        }
-    }
-
-    async fetchCardBack() {
-        try {
-            const response = await fetch('https://api.pokemontcg.io/v2/cards?q=!name:"Card Back"');
-            const data = await response.json();
-            const cardBack = data.data.find(card => card.name === 'Card Back');
-            this.cardBackUrl = cardBack?.images?.small || 'https://images.pokemontcg.io/cardback.png';
-        } catch (error) {
-            console.error('Error fetching card back:', error);
-            this.cardBackUrl = 'https://images.pokemontcg.io/cardback.png'; // Fallback URL
         }
     }
 
@@ -139,7 +164,7 @@ class DeckBuilder {
             
             // Create image element with card back as placeholder
             const img = document.createElement('img');
-            img.src = this.cardBackUrl;
+            img.src = this.cardBackUrl;  // Show card back while loading
             img.alt = card.name;
 
             // Load the actual card image
@@ -451,6 +476,47 @@ class DeckBuilder {
             if (undoBtn && this.removedCards.length === 0) {
                 undoBtn.style.display = 'none';
             }
+        }
+    }
+
+    async createSetSuggestions() {
+        try {
+            // Fetch sets from the Pokémon TCG API instead of local file
+            const response = await fetch('https://api.pokemontcg.io/v2/sets');
+            const data = await response.json();
+            
+            // Sort sets by release date (newest first)
+            const sortedSets = data.data.sort((a, b) => 
+                new Date(b.releaseDate) - new Date(a.releaseDate)
+            );
+            
+            // Create datalist element
+            const datalist = document.createElement('datalist');
+            datalist.id = 'set-suggestions';
+            
+            // Add suggestions for both set IDs and names
+            sortedSets.forEach(set => {
+                // Add set ID suggestion
+                const idOption = document.createElement('option');
+                idOption.value = `${set.id}-1`;
+                idOption.label = `${set.name} (${set.series})`;
+                datalist.appendChild(idOption);
+                
+                // Add set name suggestion
+                const nameOption = document.createElement('option');
+                nameOption.value = set.name;
+                nameOption.label = `${set.series} Series`;
+                datalist.appendChild(nameOption);
+            });
+            
+            // Add datalist to document
+            document.body.appendChild(datalist);
+            
+            // Connect datalist to search input
+            this.searchInput.setAttribute('list', 'set-suggestions');
+            
+        } catch (error) {
+            console.error('Error loading set suggestions:', error);
         }
     }
 }
