@@ -594,6 +594,21 @@ class DeckBuilder {
             'energy': 3
         };
 
+        // Define sort order for Pokémon types
+        const pokemonTypeOrder = {
+            'grass': 1,
+            'fire': 2,
+            'water': 3,
+            'lightning': 4,
+            'fighting': 5,
+            'psychic': 6,
+            'colorless': 7,
+            'darkness': 8,
+            'metal': 9,
+            'dragon': 10,
+            'fairy': 11
+        };
+
         // Sort the deck array
         this.deck.sort((a, b) => {
             const typeA = (a.supertype || '').toLowerCase();
@@ -603,9 +618,22 @@ class DeckBuilder {
             const orderA = typeOrder[typeA] || 999;
             const orderB = typeOrder[typeB] || 999;
             
-            // Sort by type order first
+            // Sort by supertype order first
             if (orderA !== orderB) {
                 return orderA - orderB;
+            }
+
+            // If both are Pokémon, sort by Pokémon type
+            if (typeA === 'pokémon' || typeA === 'pokemon') {
+                const pokemonTypeA = (a.types && a.types[0] || '').toLowerCase();
+                const pokemonTypeB = (b.types && b.types[0] || '').toLowerCase();
+                
+                const pokemonOrderA = pokemonTypeOrder[pokemonTypeA] || 999;
+                const pokemonOrderB = pokemonTypeOrder[pokemonTypeB] || 999;
+
+                if (pokemonOrderA !== pokemonOrderB) {
+                    return pokemonOrderA - pokemonOrderB;
+                }
             }
             
             // Within same type, sort by name
