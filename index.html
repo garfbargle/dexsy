@@ -11,32 +11,33 @@
 </head>
 <body>
     <div class="container">
-
-        <div class="button-container">
-            <button id="undoBtn" aria-label="Undo remove" data-label="Undo" style="display: none;">
-                ↩️
-            </button>
-            <button id="sortBtn" aria-label="Sort deck" data-label="Sort" style="display: none;">
-                🔄
-            </button>
-            <button id="clearBtn" aria-label="Clear deck" data-label="Clear">
-                🗑️
-            </button>
-            <button id="exportBtn" aria-label="Export deck" data-label="Save">
-                💾
-            </button>
-            <button id="importBtn" aria-label="Import deck" data-label="Import">
-                📂
-            </button>
-        </div>
         <h1>📕 Dexsy</h1>
         <h2> Pokémon™ Fantasy Deck Builder</h2>
         
-        <div class="deck-stats">
-            <div class="stat">🎴 Total: <span id="total-count">0</span></div>
-            <div class="stat">✨ Pokémon™: <span id="pokemon-count">0</span></div>
-            <div class="stat">⚡ Energy: <span id="energy-count">0</span></div>
-            <div class="stat">🎯 Trainers: <span id="trainer-count">0</span></div>
+        <div class="deck-controls-container">
+            <div class="deck-stats">
+                <div class="stat">🎴 Total: <span id="total-count">0</span></div>
+                <div class="stat">✨ Pokémon™: <span id="pokemon-count">0</span></div>
+                <div class="stat">⚡ Energy: <span id="energy-count">0</span></div>
+                <div class="stat">🎯 Trainers: <span id="trainer-count">0</span></div>
+            </div>
+            <div class="button-container">
+                <button id="undoBtn" aria-label="Undo remove" data-label="Undo" style="display: none;">
+                    ↩️
+                </button>
+                <button id="sortBtn" aria-label="Sort deck" data-label="Sort" style="display: none;">
+                    🔄
+                </button>
+                <button id="clearBtn" aria-label="Clear deck" data-label="Clear">
+                    🗑️
+                </button>
+                <button id="exportBtn" aria-label="Export deck" data-label="Save">
+                    💾
+                </button>
+                <button id="importBtn" aria-label="Import deck" data-label="Import">
+                    📂
+                </button>
+            </div>
         </div>
 
         <div id="deck-display" class="deck-display">

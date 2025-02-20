@@ -51,15 +51,22 @@
             text-shadow: 2px 2px var(--pokemon-yellow);
         }
         
-        .deck-stats {
+        .deck-controls-container {
             display: flex;
-            justify-content: space-around;
+            justify-content: space-between;
             background: linear-gradient(135deg, var(--gradient-start), var(--gradient-end));
             padding: 15px;
             border-radius: 15px;
             margin-bottom: 20px;
             box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+        }
+        
+        .deck-stats {
+            display: flex;
+            flex: 1;
+            justify-content: space-around;
             color: white;
+            padding-right: 15px;
         }
         
         .stat {
@@ -494,13 +501,15 @@
         
         .button-container {
             display: flex;
-            justify-content: flex-end;
             gap: 10px;
-            margin: 10px;
+            justify-content: flex-end;
+            align-items: center;
+            padding-left: 15px;
+            border-left: 2px solid rgba(255, 255, 255, 0.2);
         }
         
         .button-container button {
-            padding: 12px;
+            padding: 0;
             border: none;
             border-radius: 50%;
             background-color: white;
@@ -508,6 +517,12 @@
             transition: all 0.3s ease;
             font-size: 1.2rem;
             box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+            width: 40px;
+            height: 40px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            line-height: 1;
         }
         
         .button-container button:hover {
