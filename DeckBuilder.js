@@ -31,7 +31,7 @@ class DeckBuilder {
 
     initializeElements() {
         this.searchInput = document.getElementById('search-input');
-        this.searchInput.placeholder = '🔍 Search by name, set (sv1 or Scarlet & Violet), or card number (sv1-1)';
+        this.searchInput.placeholder = '🔍 Search by name, or use # for sets (e.g. #sv1 or #sv1-1)';
         this.searchButton = document.getElementById('search-button');
         this.searchResults = document.getElementById('search-results');
         this.deckDisplay = document.getElementById('deck-display');
@@ -95,18 +95,21 @@ class DeckBuilder {
             // Build the search query
             let searchQuery;
             
-            // Check if it's a set number search (e.g. "swsh1-1", "base1-4")
-            if (query.match(/^[a-zA-Z0-9]+-\d+$/)) {
-                searchQuery = `number:"${query.split('-')[1]}" set.id:"${query.split('-')[0]}"`;
+            // If query starts with #, it's a set search
+            if (query.startsWith('#')) {
+                const setQuery = query.substring(1); // Remove the # prefix
+                // Check if it's a set number search (e.g. "#swsh1-1", "#base1-4")
+                if (setQuery.match(/^[a-zA-Z0-9]+-\d+$/)) {
+                    searchQuery = `number:"${setQuery.split('-')[1]}" set.id:"${setQuery.split('-')[0]}"`;
+                }
+                // Check if it's a set ID without card number (e.g. "#sv1", "#swsh1")
+                else {
+                    searchQuery = `set.id:"${setQuery}"`;
+                }
             }
-            // Check if it's a set ID without card number (e.g. "sv1", "swsh1")
-            else if (query.match(/^[a-zA-Z0-9]+$/)) {
-                searchQuery = `set.id:"${query}"`;
-            }
-            // Check if it looks like a set name or series name
+            // Default to searching by card name
             else {
-                // Make the search more flexible by using contains
-                searchQuery = `(set.name:"*${query}*" OR set.series:"*${query}*")`;
+                searchQuery = `name:"*${query}*"`;
             }
 
             const response = await fetch(
@@ -613,8 +616,8 @@ class DeckBuilder {
 
     // Add new method for initial Base Set search
     initialBaseSetSearch() {
-        // Set the search input value to "base1"
-        this.searchInput.value = "base1";
+        // Set the search input value to "#base1"
+        this.searchInput.value = "#base1";
         // Trigger the search
         this.searchCards();
     }
