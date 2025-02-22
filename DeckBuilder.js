@@ -31,7 +31,7 @@ class DeckBuilder {
 
     initializeElements() {
         this.searchInput = document.getElementById('search-input');
-        this.searchInput.placeholder = '🔍 Search by name, or use # for sets (e.g. #sv1 or #sv1-1)';
+        this.searchInput.placeholder = '🔍 Search by name, #set-id (#sv1), or @set-name (@Scarlet)';
         this.searchButton = document.getElementById('search-button');
         this.searchResults = document.getElementById('search-results');
         this.deckDisplay = document.getElementById('deck-display');
@@ -81,7 +81,7 @@ class DeckBuilder {
 
     // Add new method to build search query
     buildSearchQuery(query) {
-        // If query starts with #, it's a set search
+        // If query starts with #, it's a set ID search
         if (query.startsWith('#')) {
             const setQuery = query.substring(1); // Remove the # prefix
             // Check if it's a set number search (e.g. "#swsh1-1", "#base1-4")
@@ -90,6 +90,11 @@ class DeckBuilder {
             }
             // Check if it's a set ID without card number (e.g. "#sv1", "#swsh1")
             return `set.id:"${setQuery}"`;
+        }
+        // If query starts with @, it's a set name/series search
+        if (query.startsWith('@')) {
+            const setQuery = query.substring(1); // Remove the @ prefix
+            return `(set.name:"*${setQuery}*" OR set.series:"*${setQuery}*")`;
         }
         // Default to searching by card name
         return `name:"*${query}*"`;
@@ -576,16 +581,16 @@ class DeckBuilder {
             
             // Add suggestions for both set IDs and names
             sortedSets.forEach(set => {
-                // Add set ID suggestion
+                // Add set ID suggestion with # prefix (without -1)
                 const idOption = document.createElement('option');
-                idOption.value = `${set.id}-1`;
-                idOption.label = `${set.name} (${set.series})`;
+                idOption.value = `#${set.id}`;
+                idOption.label = `${set.name} (${set.series}) - ID Search`;
                 datalist.appendChild(idOption);
                 
-                // Add set name suggestion
+                // Add set name suggestion with @ prefix
                 const nameOption = document.createElement('option');
-                nameOption.value = set.name;
-                nameOption.label = `${set.series} Series`;
+                nameOption.value = `@${set.name}`;
+                nameOption.label = `${set.series} Series - Name Search`;
                 datalist.appendChild(nameOption);
             });
             
