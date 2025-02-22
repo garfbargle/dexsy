@@ -79,6 +79,22 @@ class DeckBuilder {
         }
     }
 
+    // Add new method to build search query
+    buildSearchQuery(query) {
+        // If query starts with #, it's a set search
+        if (query.startsWith('#')) {
+            const setQuery = query.substring(1); // Remove the # prefix
+            // Check if it's a set number search (e.g. "#swsh1-1", "#base1-4")
+            if (setQuery.match(/^[a-zA-Z0-9]+-\d+$/)) {
+                return `number:"${setQuery.split('-')[1]}" set.id:"${setQuery.split('-')[0]}"`;
+            }
+            // Check if it's a set ID without card number (e.g. "#sv1", "#swsh1")
+            return `set.id:"${setQuery}"`;
+        }
+        // Default to searching by card name
+        return `name:"*${query}*"`;
+    }
+
     async searchCards() {
         const query = this.searchInput.value.trim();
         if (!query) return;
@@ -91,26 +107,7 @@ class DeckBuilder {
 
         try {
             this.isLoading = true;
-            
-            // Build the search query
-            let searchQuery;
-            
-            // If query starts with #, it's a set search
-            if (query.startsWith('#')) {
-                const setQuery = query.substring(1); // Remove the # prefix
-                // Check if it's a set number search (e.g. "#swsh1-1", "#base1-4")
-                if (setQuery.match(/^[a-zA-Z0-9]+-\d+$/)) {
-                    searchQuery = `number:"${setQuery.split('-')[1]}" set.id:"${setQuery.split('-')[0]}"`;
-                }
-                // Check if it's a set ID without card number (e.g. "#sv1", "#swsh1")
-                else {
-                    searchQuery = `set.id:"${setQuery}"`;
-                }
-            }
-            // Default to searching by card name
-            else {
-                searchQuery = `name:"*${query}*"`;
-            }
+            const searchQuery = this.buildSearchQuery(query);
 
             const response = await fetch(
                 `https://api.pokemontcg.io/v2/cards?q=${searchQuery}&page=${this.currentPage}&pageSize=20`
@@ -135,18 +132,7 @@ class DeckBuilder {
             this.isLoading = true;
             this.currentPage++;
 
-            const query = this.lastSearchQuery;
-            let searchQuery;
-            
-            if (query.match(/^[a-zA-Z0-9]+-\d+$/)) {
-                searchQuery = `number:"${query.split('-')[1]}" set.id:"${query.split('-')[0]}"`;
-            }
-            else if (query.match(/^[a-zA-Z0-9]+$/)) {
-                searchQuery = `set.id:"${query}"`;
-            }
-            else {
-                searchQuery = `(set.name:"*${query}*" OR set.series:"*${query}*")`;
-            }
+            const searchQuery = this.buildSearchQuery(this.lastSearchQuery);
 
             const response = await fetch(
                 `https://api.pokemontcg.io/v2/cards?q=${searchQuery}&page=${this.currentPage}&pageSize=20`
