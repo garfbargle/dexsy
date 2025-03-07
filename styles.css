@@ -441,113 +441,18 @@
         }
         
         .modal-content {
-            background: white;
-            border-radius: 12px;
             max-width: 90%;
             max-height: 90%;
-            overflow: auto;
+            overflow: hidden;
             padding: 30px;
-            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.4);
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            position: relative;
         }
         
         .modal-content img {
             max-width: 100%;
-            max-height: 65vh;
+            max-height: 90vh;
             object-fit: contain;
             border-radius: 8px;
             box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
-        }
-        
-        .modal-info {
-            width: 100%;
-            margin-top: 20px;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-        }
-        
-        .modal-info h2 {
-            font-size: 24px;
-            font-weight: bold;
-            margin-bottom: 10px;
-            color: #2a75bb;
-            text-align: center;
-        }
-        
-        .modal-rarity {
-            display: inline-block;
-            padding: 5px 12px;
-            border-radius: 20px;
-            font-weight: bold;
-            color: white;
-            margin-bottom: 15px;
-            text-transform: uppercase;
-        }
-        
-        .modal-price-section {
-            background: linear-gradient(to bottom, #f8f9fa, #e9ecef);
-            border: 2px solid #dee2e6;
-            border-radius: 10px;
-            padding: 15px;
-            width: 100%;
-            max-width: 400px;
-            text-align: center;
-            margin-top: 10px;
-        }
-        
-        .modal-price-section h3 {
-            color: #2a75bb;
-            margin-bottom: 10px;
-            font-size: 18px;
-            border-bottom: 2px solid #ffcb05;
-            padding-bottom: 5px;
-            display: inline-block;
-        }
-        
-        .price-details {
-            display: flex;
-            flex-direction: column;
-            gap: 8px;
-            margin-bottom: 15px;
-        }
-        
-        .price-details p {
-            margin: 0;
-            font-size: 14px;
-            color: #495057;
-        }
-        
-        .price-details span {
-            font-weight: bold;
-            color: #212529;
-        }
-        
-        .modal-price span {
-            color: #0b9444;
-            font-size: 18px;
-        }
-        
-        .modal-tcgplayer-button {
-            background: linear-gradient(135deg, #ffcb05 0%, #e6b800 100%);
-            color: #2a75bb;
-            border: none;
-            border-radius: 20px;
-            padding: 8px 16px;
-            font-weight: bold;
-            cursor: pointer;
-            transition: all 0.2s;
-            border: 2px solid #3c5aa6;
-            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
-            font-size: 14px;
-        }
-        
-        .modal-tcgplayer-button:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
         }
         
         .card-buttons {

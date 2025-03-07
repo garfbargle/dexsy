@@ -369,7 +369,7 @@ class DeckBuilder {
             // Add click handler for card zoom
             cardElement.addEventListener('click', (e) => {
                 if (!e.target.classList.contains('card-button')) {
-                    this.showCardModal(card);
+                    this.showCardModal(card.images.large || card.images.small);
                 }
             });
 
