@@ -39,7 +39,8 @@ class DeckBuilder {
             total: document.getElementById('total-count'),
             pokemon: document.getElementById('pokemon-count'),
             energy: document.getElementById('energy-count'),
-            trainer: document.getElementById('trainer-count')
+            trainer: document.getElementById('trainer-count'),
+            price: document.getElementById('price-count')
         };
         
         // Add datalist for set suggestions
@@ -216,7 +217,7 @@ class DeckBuilder {
             // Add click handler for card zoom
             cardElement.addEventListener('click', (e) => {
                 if (!e.target.classList.contains('card-button')) {
-                    this.showCardModal(card);
+                    this.showCardModal(card.images.large || card.images.small);
                 }
             });
 
@@ -411,12 +412,23 @@ class DeckBuilder {
             } else if (type === 'trainer') {
                 acc.trainer++;
             }
+            
+            // Add price if available
+            const priceData = this.getCardPriceData(card);
+            if (priceData.price) {
+                acc.price += priceData.price;
+            }
+            
             return acc;
-        }, { total: 0, pokemon: 0, energy: 0, trainer: 0 });
+        }, { total: 0, pokemon: 0, energy: 0, trainer: 0, price: 0 });
 
-        Object.keys(this.counters).forEach(key => {
+        // Update count displays
+        for (const key of ['total', 'pokemon', 'energy', 'trainer']) {
             this.counters[key].textContent = counts[key];
-        });
+        }
+        
+        // Format and update price display
+        this.counters.price.textContent = '$' + counts.price.toFixed(2);
 
         // Show/hide game start button based on deck size
         if (this.deck.length >= 40) {
