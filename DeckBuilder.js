@@ -180,12 +180,34 @@ class DeckBuilder {
             };
             actualImage.src = card.images.small;
 
+            // Get price and rarity data
+            const priceData = this.getCardPriceData(card);
+            
+            // Add price and rarity information
+            let priceHTML = '';
+            if (priceData.price) {
+                priceHTML = `
+                    <div class="price-badge">
+                        <span class="price-value">$${priceData.price.toFixed(2)}</span>
+                    </div>
+                `;
+            }
+
+            // Add rarity badge
+            const rarityHTML = `
+                <div class="rarity-badge ${priceData.rarity.toLowerCase().replace(/\s+/g, '-')}">
+                    <span>${priceData.rarity}</span>
+                </div>
+            `;
+
             // Add buttons for adding to deck and TCGPlayer
             const buttonsHTML = `
                 <div class="card-buttons">
                     <button class="card-button" title="Add to deck">➕</button>
                     <button class="card-button tcgplayer-button" title="View on TCGPlayer">💰</button>
                 </div>
+                ${priceHTML}
+                ${rarityHTML}
             `;
             
             cardElement.innerHTML = buttonsHTML;
@@ -194,7 +216,7 @@ class DeckBuilder {
             // Add click handler for card zoom
             cardElement.addEventListener('click', (e) => {
                 if (!e.target.classList.contains('card-button')) {
-                    this.showCardModal(card.images.large || card.images.small);
+                    this.showCardModal(card);
                 }
             });
 
@@ -244,6 +266,35 @@ class DeckBuilder {
         }
     }
 
+    // Enhanced helper method to get card price and rarity data
+    getCardPriceData(card) {
+        let priceData = { 
+            price: null,
+            category: null,
+            updatedAt: null,
+            rarity: card.rarity || 'Unknown'
+        };
+        
+        if (card.tcgplayer && card.tcgplayer.prices) {
+            // Get the first available price category (normal, holofoil, etc.)
+            const priceCategories = Object.keys(card.tcgplayer.prices);
+            if (priceCategories.length > 0) {
+                const category = priceCategories[0];
+                const prices = card.tcgplayer.prices[category];
+                
+                // Prefer market price, fall back to mid, then low
+                const price = prices.market || prices.mid || prices.low;
+                if (price) {
+                    priceData.price = price;
+                    priceData.category = category;
+                    priceData.updatedAt = card.tcgplayer.updatedAt;
+                }
+            }
+        }
+        
+        return priceData;
+    }
+
     updateDeckDisplay() {
         this.deckDisplay.innerHTML = '';
         
@@ -279,6 +330,26 @@ class DeckBuilder {
             countBadge.className = 'card-count';
             countBadge.textContent = `×${count}`;
 
+            // Get price and rarity data
+            const priceData = this.getCardPriceData(card);
+            
+            // Add price information
+            let priceHTML = '';
+            if (priceData.price) {
+                priceHTML = `
+                    <div class="price-badge">
+                        <span class="price-value">$${priceData.price.toFixed(2)}</span>
+                    </div>
+                `;
+            }
+
+            // Add rarity badge
+            const rarityHTML = `
+                <div class="rarity-badge ${priceData.rarity.toLowerCase().replace(/\s+/g, '-')}">
+                    <span>${priceData.rarity}</span>
+                </div>
+            `;
+
             // Add buttons for quantity control and TCGPlayer
             const buttonsHTML = `
                 <div class="card-buttons">
@@ -286,6 +357,8 @@ class DeckBuilder {
                     <button class="card-button increase-button" title="Increase quantity">➕</button>
                     <button class="card-button tcgplayer-button" title="View on TCGPlayer">💰</button>
                 </div>
+                ${priceHTML}
+                ${rarityHTML}
             `;
 
             cardElement.innerHTML = buttonsHTML;
@@ -295,7 +368,7 @@ class DeckBuilder {
             // Add click handler for card zoom
             cardElement.addEventListener('click', (e) => {
                 if (!e.target.classList.contains('card-button')) {
-                    this.showCardModal(card.images.large || card.images.small);
+                    this.showCardModal(card);
                 }
             });
 

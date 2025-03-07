@@ -441,17 +441,113 @@
         }
         
         .modal-content {
+            background: white;
+            border-radius: 12px;
             max-width: 90%;
-            max-height: 90vh;
-            border-radius: 20px;
-            overflow: hidden;
-            box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+            max-height: 90%;
+            overflow: auto;
+            padding: 30px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.4);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            position: relative;
         }
         
         .modal-content img {
             max-width: 100%;
-            max-height: 90vh;
+            max-height: 65vh;
             object-fit: contain;
+            border-radius: 8px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+        }
+        
+        .modal-info {
+            width: 100%;
+            margin-top: 20px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+        
+        .modal-info h2 {
+            font-size: 24px;
+            font-weight: bold;
+            margin-bottom: 10px;
+            color: #2a75bb;
+            text-align: center;
+        }
+        
+        .modal-rarity {
+            display: inline-block;
+            padding: 5px 12px;
+            border-radius: 20px;
+            font-weight: bold;
+            color: white;
+            margin-bottom: 15px;
+            text-transform: uppercase;
+        }
+        
+        .modal-price-section {
+            background: linear-gradient(to bottom, #f8f9fa, #e9ecef);
+            border: 2px solid #dee2e6;
+            border-radius: 10px;
+            padding: 15px;
+            width: 100%;
+            max-width: 400px;
+            text-align: center;
+            margin-top: 10px;
+        }
+        
+        .modal-price-section h3 {
+            color: #2a75bb;
+            margin-bottom: 10px;
+            font-size: 18px;
+            border-bottom: 2px solid #ffcb05;
+            padding-bottom: 5px;
+            display: inline-block;
+        }
+        
+        .price-details {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+            margin-bottom: 15px;
+        }
+        
+        .price-details p {
+            margin: 0;
+            font-size: 14px;
+            color: #495057;
+        }
+        
+        .price-details span {
+            font-weight: bold;
+            color: #212529;
+        }
+        
+        .modal-price span {
+            color: #0b9444;
+            font-size: 18px;
+        }
+        
+        .modal-tcgplayer-button {
+            background: linear-gradient(135deg, #ffcb05 0%, #e6b800 100%);
+            color: #2a75bb;
+            border: none;
+            border-radius: 20px;
+            padding: 8px 16px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.2s;
+            border: 2px solid #3c5aa6;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+            font-size: 14px;
+        }
+        
+        .modal-tcgplayer-button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
         }
         
         .card-buttons {
@@ -892,4 +988,91 @@
             0% { opacity: 0.6; }
             50% { opacity: 1; }
             100% { opacity: 0.6; }
+        }
+        
+        .price-badge {
+            position: absolute;
+            bottom: 40px;
+            right: 10px;
+            background: linear-gradient(135deg, #ffcb05 0%, #e6b800 100%);
+            border: 2px solid #3c5aa6;
+            border-radius: 20px;
+            padding: 3px 8px;
+            font-size: 12px;
+            font-weight: bold;
+            color: #2a75bb;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.3);
+            z-index: 2;
+            transition: transform 0.2s, box-shadow 0.2s;
+        }
+        
+        .price-badge .price-value {
+            text-shadow: 1px 1px 0px rgba(255, 255, 255, 0.5);
+        }
+        
+        .card:hover .price-badge {
+            transform: scale(1.05);
+            box-shadow: 0 3px 8px rgba(0, 0, 0, 0.4);
+        }
+        
+        .rarity-badge {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            border-radius: 15px;
+            padding: 2px 6px;
+            font-size: 10px;
+            font-weight: bold;
+            color: white;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+            z-index: 2;
+            text-transform: uppercase;
+            border: 1px solid rgba(255, 255, 255, 0.5);
+        }
+        
+        .rarity-badge.common {
+            background: linear-gradient(135deg, #8e9ca3 0%, #5c6b73 100%);
+        }
+        
+        .rarity-badge.uncommon {
+            background: linear-gradient(135deg, #2a9d8f 0%, #1a6158 100%);
+        }
+        
+        .rarity-badge.rare {
+            background: linear-gradient(135deg, #118ab2 0%, #0a5a75 100%);
+        }
+        
+        .rarity-badge.rare-holo {
+            background: linear-gradient(135deg, #073b4c 0%, #042431 100%);
+        }
+        
+        .rarity-badge.rare-ultra, 
+        .rarity-badge.ultra-rare {
+            background: linear-gradient(135deg, #9b5de5 0%, #6c3e9e 100%);
+        }
+        
+        .rarity-badge.rare-secret, 
+        .rarity-badge.secret-rare {
+            background: linear-gradient(135deg, #f15bb5 0%, #b7447f 100%);
+        }
+        
+        .rarity-badge.rare-rainbow, 
+        .rarity-badge.rainbow-rare {
+            background: linear-gradient(135deg, #ff9e00, #ff0058, #7a00ff);
+        }
+        
+        .rarity-badge.promo {
+            background: linear-gradient(135deg, #ff7b00 0%, #c86000 100%);
+        }
+        
+        .rarity-badge.amazing-rare {
+            background: linear-gradient(135deg, #00bbf9, #0466c8, #9b5de5);
+        }
+        
+        .rarity-badge.unknown {
+            background: linear-gradient(135deg, #495057 0%, #343a40 100%);
+        }
+        
+        .card:hover .rarity-badge {
+            transform: scale(1.05);
         } 
