@@ -184,7 +184,7 @@ class DeckBuilder {
             // Get price and rarity data
             const priceData = this.getCardPriceData(card);
             
-            // Add price and rarity information
+            // Add price information
             let priceHTML = '';
             if (priceData.price) {
                 priceHTML = `
@@ -194,13 +194,6 @@ class DeckBuilder {
                 `;
             }
 
-            // Add rarity badge
-            const rarityHTML = `
-                <div class="rarity-badge ${priceData.rarity.toLowerCase().replace(/\s+/g, '-')}">
-                    <span>${priceData.rarity}</span>
-                </div>
-            `;
-
             // Add buttons for adding to deck and TCGPlayer
             const buttonsHTML = `
                 <div class="card-buttons">
@@ -208,7 +201,6 @@ class DeckBuilder {
                     <button class="card-button tcgplayer-button" title="View on TCGPlayer">💰</button>
                 </div>
                 ${priceHTML}
-                ${rarityHTML}
             `;
             
             cardElement.innerHTML = buttonsHTML;
@@ -272,8 +264,7 @@ class DeckBuilder {
         let priceData = { 
             price: null,
             category: null,
-            updatedAt: null,
-            rarity: card.rarity || 'Unknown'
+            updatedAt: null
         };
         
         if (card.tcgplayer && card.tcgplayer.prices) {
@@ -344,13 +335,6 @@ class DeckBuilder {
                 `;
             }
 
-            // Add rarity badge
-            const rarityHTML = `
-                <div class="rarity-badge ${priceData.rarity.toLowerCase().replace(/\s+/g, '-')}">
-                    <span>${priceData.rarity}</span>
-                </div>
-            `;
-
             // Add buttons for quantity control and TCGPlayer
             const buttonsHTML = `
                 <div class="card-buttons">
@@ -359,7 +343,6 @@ class DeckBuilder {
                     <button class="card-button tcgplayer-button" title="View on TCGPlayer">💰</button>
                 </div>
                 ${priceHTML}
-                ${rarityHTML}
             `;
 
             cardElement.innerHTML = buttonsHTML;

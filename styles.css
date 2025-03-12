@@ -897,15 +897,15 @@
         
         .price-badge {
             position: absolute;
-            bottom: 40px;
-            right: 10px;
+            top: 8px;
+            right: 8px;
             background: linear-gradient(135deg, #ffcb05 0%, #e6b800 100%);
             border: 2px solid #3c5aa6;
             border-radius: 20px;
             padding: 3px 8px;
             font-size: 12px;
             font-weight: bold;
-            color: #2a75bb;
+            color: black;
             box-shadow: 0 2px 5px rgba(0, 0, 0, 0.3);
             z-index: 2;
             transition: transform 0.2s, box-shadow 0.2s;
@@ -920,64 +920,6 @@
             box-shadow: 0 3px 8px rgba(0, 0, 0, 0.4);
         }
         
-        .rarity-badge {
-            position: absolute;
-            top: 10px;
-            right: 10px;
-            border-radius: 15px;
-            padding: 2px 6px;
-            font-size: 10px;
-            font-weight: bold;
-            color: white;
-            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
-            z-index: 2;
-            text-transform: uppercase;
-            border: 1px solid rgba(255, 255, 255, 0.5);
-        }
-        
-        .rarity-badge.common {
-            background: linear-gradient(135deg, #8e9ca3 0%, #5c6b73 100%);
-        }
-        
-        .rarity-badge.uncommon {
-            background: linear-gradient(135deg, #2a9d8f 0%, #1a6158 100%);
-        }
-        
-        .rarity-badge.rare {
-            background: linear-gradient(135deg, #118ab2 0%, #0a5a75 100%);
-        }
-        
-        .rarity-badge.rare-holo {
-            background: linear-gradient(135deg, #073b4c 0%, #042431 100%);
-        }
-        
-        .rarity-badge.rare-ultra, 
-        .rarity-badge.ultra-rare {
-            background: linear-gradient(135deg, #9b5de5 0%, #6c3e9e 100%);
-        }
-        
-        .rarity-badge.rare-secret, 
-        .rarity-badge.secret-rare {
-            background: linear-gradient(135deg, #f15bb5 0%, #b7447f 100%);
-        }
-        
-        .rarity-badge.rare-rainbow, 
-        .rarity-badge.rainbow-rare {
-            background: linear-gradient(135deg, #ff9e00, #ff0058, #7a00ff);
-        }
-        
-        .rarity-badge.promo {
-            background: linear-gradient(135deg, #ff7b00 0%, #c86000 100%);
-        }
-        
-        .rarity-badge.amazing-rare {
-            background: linear-gradient(135deg, #00bbf9, #0466c8, #9b5de5);
-        }
-        
-        .rarity-badge.unknown {
-            background: linear-gradient(135deg, #495057 0%, #343a40 100%);
-        }
-        
-        .card:hover .rarity-badge {
-            transform: scale(1.05);
+        .loading-indicator {
+            display: none;
         } 
