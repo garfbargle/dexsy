@@ -694,48 +694,149 @@ class DeckBuilder {
         // Define sort order for Pokémon types
         const pokemonTypeOrder = {
             'grass': 1,
-            'fire': 2,
-            'water': 3,
+            'water': 2,
+            'fire': 3,
             'lightning': 4,
-            'fighting': 5,
-            'psychic': 6,
-            'colorless': 7,
-            'darkness': 8,
-            'metal': 9,
-            'dragon': 10,
-            'fairy': 11
+            'colorless': 5,
+            'darkness': 6,
+            'metal': 7,
+            'dragon': 8,
+            'psychic': 9
         };
 
-        // Sort the deck array
-        this.deck.sort((a, b) => {
+        // Define sort order for Trainer subtypes
+        const trainerSubtypeOrder = {
+            'supporter': 1,
+            'item': 2,
+            'pokemon tool': 3,
+            'stadium': 4
+        };
+
+        // Define sort order for Pokemon stages
+        const stageOrder = {
+            'stage 2': 1,
+            'stage 1': 2,
+            'basic': 3
+        };
+
+        // Group Pokemon by evolution lines
+        const evolutionLines = new Map();
+        const nonPokemonCards = [];
+
+        // First pass: organize Pokemon into evolution lines
+        this.deck.forEach(card => {
+            const type = (card.supertype || '').toLowerCase();
+            if (type === 'pokémon' || type === 'pokemon') {
+                const evolvesFrom = card.evolvesFrom;
+                if (evolvesFrom) {
+                    // This is an evolution card
+                    let foundLine = false;
+                    evolutionLines.forEach((line, key) => {
+                        if (line.some(c => c.name === evolvesFrom)) {
+                            if (!line.some(c => c.name === card.name)) {
+                                line.push(card);
+                            }
+                            foundLine = true;
+                        }
+                    });
+                    if (!foundLine) {
+                        // Start a new evolution line
+                        evolutionLines.set(card.name, [card]);
+                    }
+                } else {
+                    // This is a basic Pokemon
+                    if (!Array.from(evolutionLines.values()).flat().some(c => c.evolvesFrom === card.name)) {
+                        // Only add if it's not already part of an evolution line
+                        evolutionLines.set(card.name, [card]);
+                    }
+                }
+            } else {
+                nonPokemonCards.push(card);
+            }
+        });
+
+        // Sort each evolution line internally by stage
+        evolutionLines.forEach((line) => {
+            line.sort((a, b) => {
+                const stageA = (a.subtypes && a.subtypes.find(s => s.toLowerCase().includes('stage')) || 'basic').toLowerCase();
+                const stageB = (b.subtypes && b.subtypes.find(s => s.toLowerCase().includes('stage')) || 'basic').toLowerCase();
+                return stageOrder[stageA] - stageOrder[stageB];
+            });
+        });
+
+        // Convert evolution lines to array and sort by type
+        const sortedPokemon = Array.from(evolutionLines.values()).flat();
+        sortedPokemon.sort((a, b) => {
+            const typeA = (a.types && a.types[0] || '').toLowerCase();
+            const typeB = (b.types && b.types[0] || '').toLowerCase();
+            
+            const pokemonOrderA = pokemonTypeOrder[typeA] || 999;
+            const pokemonOrderB = pokemonTypeOrder[typeB] || 999;
+
+            if (pokemonOrderA !== pokemonOrderB) {
+                return pokemonOrderA - pokemonOrderB;
+            }
+
+            // If same type, keep evolution lines together
+            const lineA = Array.from(evolutionLines.values()).find(line => line.includes(a));
+            const lineB = Array.from(evolutionLines.values()).find(line => line.includes(b));
+            
+            if (lineA === lineB) {
+                // Same evolution line, sort by stage
+                const stageA = (a.subtypes && a.subtypes.find(s => s.toLowerCase().includes('stage')) || 'basic').toLowerCase();
+                const stageB = (b.subtypes && b.subtypes.find(s => s.toLowerCase().includes('stage')) || 'basic').toLowerCase();
+                return stageOrder[stageA] - stageOrder[stageB];
+            }
+
+            // Different evolution lines, sort by basic Pokemon name
+            const basicA = lineA.find(c => !c.evolvesFrom) || lineA[0];
+            const basicB = lineB.find(c => !c.evolvesFrom) || lineB[0];
+            return basicA.name.localeCompare(basicB.name);
+        });
+
+        // Sort non-Pokemon cards
+        nonPokemonCards.sort((a, b) => {
             const typeA = (a.supertype || '').toLowerCase();
             const typeB = (b.supertype || '').toLowerCase();
             
-            // Get order values (default to highest number if type not found)
             const orderA = typeOrder[typeA] || 999;
             const orderB = typeOrder[typeB] || 999;
             
-            // Sort by supertype order first
             if (orderA !== orderB) {
                 return orderA - orderB;
             }
 
-            // If both are Pokémon, sort by Pokémon type
-            if (typeA === 'pokémon' || typeA === 'pokemon') {
-                const pokemonTypeA = (a.types && a.types[0] || '').toLowerCase();
-                const pokemonTypeB = (b.types && b.types[0] || '').toLowerCase();
+            // If both are Trainers, sort by subtype
+            if (typeA === 'trainer') {
+                const trainerSubtypeA = (a.subtypes && a.subtypes[0] || '').toLowerCase();
+                const trainerSubtypeB = (b.subtypes && b.subtypes[0] || '').toLowerCase();
                 
-                const pokemonOrderA = pokemonTypeOrder[pokemonTypeA] || 999;
-                const pokemonOrderB = pokemonTypeOrder[pokemonTypeB] || 999;
+                const trainerOrderA = trainerSubtypeOrder[trainerSubtypeA] || 999;
+                const trainerOrderB = trainerSubtypeOrder[trainerSubtypeB] || 999;
 
-                if (pokemonOrderA !== pokemonOrderB) {
-                    return pokemonOrderA - pokemonOrderB;
+                if (trainerOrderA !== trainerOrderB) {
+                    return trainerOrderA - trainerOrderB;
+                }
+            }
+
+            // If both are Energy, sort by type
+            if (typeA === 'energy') {
+                const energyTypeA = (a.subtypes && a.subtypes.includes('Basic') ? a.name.split(' ')[0] : '').toLowerCase();
+                const energyTypeB = (b.subtypes && b.subtypes.includes('Basic') ? b.name.split(' ')[0] : '').toLowerCase();
+                
+                const energyOrderA = pokemonTypeOrder[energyTypeA] || 999;
+                const energyOrderB = pokemonTypeOrder[energyTypeB] || 999;
+
+                if (energyOrderA !== energyOrderB) {
+                    return energyOrderA - energyOrderB;
                 }
             }
             
-            // Within same type, sort by name
             return a.name.localeCompare(b.name);
         });
+
+        // Combine sorted Pokemon with non-Pokemon cards
+        this.deck = [...sortedPokemon, ...nonPokemonCards];
 
         // Update the display
         this.updateDeckDisplay();
