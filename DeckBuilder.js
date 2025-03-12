@@ -194,9 +194,19 @@ class DeckBuilder {
                 `;
             }
 
-            // Add buttons for adding to deck and TCGPlayer
+            // Check if card is in deck
+            const isInDeck = this.deck.some(c => 
+                c.name === card.name && 
+                c.number === card.number && 
+                c.set.id === card.set.id
+            );
+
+            // Add buttons for adding to deck, status indicator, and TCGPlayer
             const buttonsHTML = `
                 <div class="card-buttons">
+                    <div class="status-box ${isInDeck ? 'in-deck' : 'not-in-deck'}">
+                        ${isInDeck ? '✔' : '❌'}
+                    </div>
                     <button class="card-button" title="Add to deck">➕</button>
                     <button class="card-button tcgplayer-button" title="View on TCGPlayer">💰</button>
                 </div>
@@ -218,6 +228,11 @@ class DeckBuilder {
             addButton.addEventListener('click', (e) => {
                 e.stopPropagation();
                 this.addCardToDeck(card);
+                // Update status box after adding card
+                const statusBox = cardElement.querySelector('.status-box');
+                statusBox.classList.remove('not-in-deck');
+                statusBox.classList.add('in-deck');
+                statusBox.textContent = '✔';
             });
 
             // Add click handler for TCGPlayer button
@@ -719,91 +734,42 @@ class DeckBuilder {
             'basic': 3
         };
 
-        // Group Pokemon by evolution lines
-        const evolutionLines = new Map();
-        const nonPokemonCards = [];
-
-        // First pass: organize Pokemon into evolution lines
-        this.deck.forEach(card => {
-            const type = (card.supertype || '').toLowerCase();
-            if (type === 'pokémon' || type === 'pokemon') {
-                const evolvesFrom = card.evolvesFrom;
-                if (evolvesFrom) {
-                    // This is an evolution card
-                    let foundLine = false;
-                    evolutionLines.forEach((line, key) => {
-                        if (line.some(c => c.name === evolvesFrom)) {
-                            if (!line.some(c => c.name === card.name)) {
-                                line.push(card);
-                            }
-                            foundLine = true;
-                        }
-                    });
-                    if (!foundLine) {
-                        // Start a new evolution line
-                        evolutionLines.set(card.name, [card]);
-                    }
-                } else {
-                    // This is a basic Pokemon
-                    if (!Array.from(evolutionLines.values()).flat().some(c => c.evolvesFrom === card.name)) {
-                        // Only add if it's not already part of an evolution line
-                        evolutionLines.set(card.name, [card]);
-                    }
-                }
-            } else {
-                nonPokemonCards.push(card);
-            }
-        });
-
-        // Sort each evolution line internally by stage
-        evolutionLines.forEach((line) => {
-            line.sort((a, b) => {
-                const stageA = (a.subtypes && a.subtypes.find(s => s.toLowerCase().includes('stage')) || 'basic').toLowerCase();
-                const stageB = (b.subtypes && b.subtypes.find(s => s.toLowerCase().includes('stage')) || 'basic').toLowerCase();
-                return stageOrder[stageA] - stageOrder[stageB];
-            });
-        });
-
-        // Convert evolution lines to array and sort by type
-        const sortedPokemon = Array.from(evolutionLines.values()).flat();
-        sortedPokemon.sort((a, b) => {
-            const typeA = (a.types && a.types[0] || '').toLowerCase();
-            const typeB = (b.types && b.types[0] || '').toLowerCase();
-            
-            const pokemonOrderA = pokemonTypeOrder[typeA] || 999;
-            const pokemonOrderB = pokemonTypeOrder[typeB] || 999;
-
-            if (pokemonOrderA !== pokemonOrderB) {
-                return pokemonOrderA - pokemonOrderB;
-            }
-
-            // If same type, keep evolution lines together
-            const lineA = Array.from(evolutionLines.values()).find(line => line.includes(a));
-            const lineB = Array.from(evolutionLines.values()).find(line => line.includes(b));
-            
-            if (lineA === lineB) {
-                // Same evolution line, sort by stage
-                const stageA = (a.subtypes && a.subtypes.find(s => s.toLowerCase().includes('stage')) || 'basic').toLowerCase();
-                const stageB = (b.subtypes && b.subtypes.find(s => s.toLowerCase().includes('stage')) || 'basic').toLowerCase();
-                return stageOrder[stageA] - stageOrder[stageB];
-            }
-
-            // Different evolution lines, sort by basic Pokemon name
-            const basicA = lineA.find(c => !c.evolvesFrom) || lineA[0];
-            const basicB = lineB.find(c => !c.evolvesFrom) || lineB[0];
-            return basicA.name.localeCompare(basicB.name);
-        });
-
-        // Sort non-Pokemon cards
-        nonPokemonCards.sort((a, b) => {
+        // Sort the deck array
+        this.deck.sort((a, b) => {
             const typeA = (a.supertype || '').toLowerCase();
             const typeB = (b.supertype || '').toLowerCase();
             
+            // Get order values (default to highest number if type not found)
             const orderA = typeOrder[typeA] || 999;
             const orderB = typeOrder[typeB] || 999;
             
+            // Sort by supertype order first
             if (orderA !== orderB) {
                 return orderA - orderB;
+            }
+
+            // If both are Pokémon, sort by type and stage
+            if (typeA === 'pokémon' || typeA === 'pokemon') {
+                const pokemonTypeA = (a.types && a.types[0] || '').toLowerCase();
+                const pokemonTypeB = (b.types && b.types[0] || '').toLowerCase();
+                
+                const pokemonOrderA = pokemonTypeOrder[pokemonTypeA] || 999;
+                const pokemonOrderB = pokemonTypeOrder[pokemonTypeB] || 999;
+
+                if (pokemonOrderA !== pokemonOrderB) {
+                    return pokemonOrderA - pokemonOrderB;
+                }
+
+                // Within same type, sort by stage
+                const stageA = (a.subtypes && a.subtypes.find(s => s.toLowerCase().includes('stage')) || 'basic').toLowerCase();
+                const stageB = (b.subtypes && b.subtypes.find(s => s.toLowerCase().includes('stage')) || 'basic').toLowerCase();
+                
+                const stageOrderA = stageOrder[stageA] || 999;
+                const stageOrderB = stageOrder[stageB] || 999;
+
+                if (stageOrderA !== stageOrderB) {
+                    return stageOrderA - stageOrderB;
+                }
             }
 
             // If both are Trainers, sort by subtype
@@ -819,7 +785,7 @@ class DeckBuilder {
                 }
             }
 
-            // If both are Energy, sort by type
+            // If both are Energy, sort by type (using same order as Pokemon types)
             if (typeA === 'energy') {
                 const energyTypeA = (a.subtypes && a.subtypes.includes('Basic') ? a.name.split(' ')[0] : '').toLowerCase();
                 const energyTypeB = (b.subtypes && b.subtypes.includes('Basic') ? b.name.split(' ')[0] : '').toLowerCase();
@@ -832,11 +798,9 @@ class DeckBuilder {
                 }
             }
             
+            // Within same type/subtype/stage, sort by name
             return a.name.localeCompare(b.name);
         });
-
-        // Combine sorted Pokemon with non-Pokemon cards
-        this.deck = [...sortedPokemon, ...nonPokemonCards];
 
         // Update the display
         this.updateDeckDisplay();
