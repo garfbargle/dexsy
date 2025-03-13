@@ -462,8 +462,10 @@
             display: flex;
             gap: 5px;
             align-items: center;
+            background: rgba(50, 50, 50, 0.8);
+            padding: 4px;
+            border-radius: 8px;
         }
-        
         .status-box {
             width: 24px;
             height: 24px;
