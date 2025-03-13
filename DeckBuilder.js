@@ -21,7 +21,7 @@ class DeckBuilder {
         this.isLoading = false;
         this.hasMoreResults = true;
         this.lastSearchQuery = '';
-
+        
         // Add initial search for Base Set
         this.initialBaseSetSearch();
 
@@ -31,7 +31,7 @@ class DeckBuilder {
 
     initializeElements() {
         this.searchInput = document.getElementById('search-input');
-        this.searchInput.placeholder = '🔍 Search by name, #set-id (#sv1), or @set-name (@Scarlet)';
+        this.searchInput.placeholder = '🔍 Search by name, #set-id, @set-name, $V, $GX, $EX, $VSTAR, $VMAX, $TagTeam, $Prism, $ACESPEC';
         this.searchButton = document.getElementById('search-button');
         this.searchResults = document.getElementById('search-results');
         this.deckDisplay = document.getElementById('deck-display');
@@ -82,27 +82,70 @@ class DeckBuilder {
 
     // Add new method to build search query
     buildSearchQuery(query) {
+        let searchQuery = '';
+        
+        // Check for rarity prefixes
+        if (query.startsWith('$V') && !query.includes('$VMAX') && !query.includes('$VSTAR')) {
+            // V cards (excluding VMAX and VSTAR)
+            return `(name:"*-V" OR name:"* V" OR name:" V " OR subtypes:"V" OR name:" V") -name:"VMAX" -name:"VSTAR"`;
+        } 
+        else if (query.startsWith('$GX')) {
+            // GX cards
+            return `(name:"*-GX" OR name:"* GX" OR name:" GX " OR subtypes:"GX")`;
+        } 
+        else if (query.startsWith('$EX')) {
+            // EX cards
+            return `(name:"*-EX" OR name:"* EX" OR name:" EX " OR subtypes:"EX")`;
+        } 
+        else if (query.startsWith('$VSTAR')) {
+            // VSTAR cards
+            return `(name:"*VSTAR*" OR subtypes:"VSTAR")`;
+        } 
+        else if (query.startsWith('$VMAX')) {
+            // VMAX cards
+            return `(name:"*VMAX*" OR subtypes:"VMAX")`;
+        } 
+        else if (query.startsWith('$TagTeam')) {
+            // Tag Team cards
+            return `(name:"*Tag Team*" OR subtypes:"TAG TEAM" OR name:"*&*" AND (subtypes:"GX" OR name:"*GX"))`;
+        } 
+        else if (query.startsWith('$Prism')) {
+            // Prism Star cards
+            return `(name:"*♢*" OR name:"* Prism Star" OR subtypes:"Prism Star")`;
+        } 
+        else if (query.startsWith('$ACESPEC')) {
+            // ACE SPEC cards
+            return `(name:"*ACE SPEC*" OR subtypes:"ACE SPEC" OR rarity:"ACE SPEC")`;
+        }
         // If query starts with #, it's a set ID search
-        if (query.startsWith('#')) {
+        else if (query.startsWith('#')) {
             const setQuery = query.substring(1); // Remove the # prefix
             // Check if it's a set number search (e.g. "#swsh1-1", "#base1-4")
             if (setQuery.match(/^[a-zA-Z0-9]+-\d+$/)) {
-                return `number:"${setQuery.split('-')[1]}" set.id:"${setQuery.split('-')[0]}"`;
+                searchQuery = `number:"${setQuery.split('-')[1]}" set.id:"${setQuery.split('-')[0]}"`;
             }
             // Check if it's a set ID without card number (e.g. "#sv1", "#swsh1")
-            return `set.id:"${setQuery}"`;
+            else {
+                searchQuery = `set.id:"${setQuery}"`;
+            }
         }
         // If query starts with @, it's a set name/series search
-        if (query.startsWith('@')) {
+        else if (query.startsWith('@')) {
             const setQuery = query.substring(1); // Remove the @ prefix
-            return `(set.name:"*${setQuery}*" OR set.series:"*${setQuery}*")`;
+            searchQuery = `(set.name:"*${setQuery}*" OR set.series:"*${setQuery}*")`;
         }
         // Default to searching by card name
-        return `name:"*${query}*"`;
+        else {
+            searchQuery = `name:"*${query}*"`;
+        }
+        
+        return searchQuery;
     }
 
     async searchCards() {
         const query = this.searchInput.value.trim();
+        
+        // Require a query
         if (!query) return;
 
         // Reset pagination when starting a new search
@@ -110,6 +153,13 @@ class DeckBuilder {
         this.hasMoreResults = true;
         this.lastSearchQuery = query;
         this.searchResults.innerHTML = '';
+        
+        // Add loading indicator
+        const loadingIndicator = document.createElement('div');
+        loadingIndicator.className = 'loading-indicator';
+        loadingIndicator.innerHTML = '<div class="spinner"></div><p>Searching for cards...</p>';
+        loadingIndicator.style.display = 'flex';
+        this.searchResults.appendChild(loadingIndicator);
 
         try {
             this.isLoading = true;
@@ -126,6 +176,7 @@ class DeckBuilder {
             this.displaySearchResults(data.data, false);
         } catch (error) {
             console.error('Error searching cards:', error);
+            this.searchResults.innerHTML = '<div class="error-message">An error occurred while searching for cards. Please try again.</div>';
         } finally {
             this.isLoading = false;
         }
@@ -468,6 +519,32 @@ class DeckBuilder {
         if (undoBtn) {
             undoBtn.style.display = this.removedCards.length > 0 ? 'block' : 'none';
         }
+
+        // Check if this card is now completely removed from the deck
+        const isStillInDeck = this.deck.some(c => 
+            c.name === removedCard.name && 
+            c.number === removedCard.number && 
+            c.set.id === removedCard.set.id
+        );
+
+        // Update status in search results if the card is completely removed
+        if (!isStillInDeck) {
+            // Find the card in search results and update its status
+            const searchResultCards = this.searchResults.querySelectorAll('.card');
+            searchResultCards.forEach(cardElement => {
+                // Get the card image alt text which contains the card name
+                const cardImg = cardElement.querySelector('img');
+                if (cardImg && cardImg.alt === removedCard.name) {
+                    // Update status box if this is the correct card
+                    const statusBox = cardElement.querySelector('.status-box');
+                    if (statusBox) {
+                        statusBox.classList.remove('in-deck');
+                        statusBox.classList.add('not-in-deck');
+                        statusBox.textContent = '❌';
+                    }
+                }
+            });
+        }
     }
 
     showCardModal(imageUrl) {
@@ -644,6 +721,22 @@ class DeckBuilder {
             if (undoBtn && this.removedCards.length === 0) {
                 undoBtn.style.display = 'none';
             }
+
+            // Update status in search results for the restored card
+            const searchResultCards = this.searchResults.querySelectorAll('.card');
+            searchResultCards.forEach(cardElement => {
+                // Get the card image alt text which contains the card name
+                const cardImg = cardElement.querySelector('img');
+                if (cardImg && cardImg.alt === cardToRestore.name) {
+                    // Update status box if this is the correct card
+                    const statusBox = cardElement.querySelector('.status-box');
+                    if (statusBox) {
+                        statusBox.classList.remove('not-in-deck');
+                        statusBox.classList.add('in-deck');
+                        statusBox.textContent = '✔';
+                    }
+                }
+            });
         }
     }
 

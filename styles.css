@@ -905,13 +905,39 @@
         }
         
         .loading-indicator {
-            display: none;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            width: 100%;
+            padding: 30px 0;
         }
         
-        @keyframes pulse {
-            0% { opacity: 0.6; }
-            50% { opacity: 1; }
-            100% { opacity: 0.6; }
+        .spinner {
+            width: 40px;
+            height: 40px;
+            border: 4px solid rgba(0, 0, 0, 0.1);
+            border-radius: 50%;
+            border-top-color: #007bff;
+            margin-bottom: 15px;
+            animation: spin 1s ease-in-out infinite;
+        }
+        
+        @keyframes spin {
+            to {
+                transform: rotate(360deg);
+            }
+        }
+        
+        .error-message {
+            color: #dc3545;
+            text-align: center;
+            padding: 20px;
+            font-weight: bold;
+            background-color: rgba(220, 53, 69, 0.1);
+            border-radius: 5px;
+            margin: 20px auto;
+            max-width: 80%;
         }
         
         .price-badge {
@@ -940,5 +966,98 @@
         }
         
         .loading-indicator {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            width: 100%;
+            padding: 30px 0;
+        }
+        
+        .spinner {
+            width: 40px;
+            height: 40px;
+            border: 4px solid rgba(0, 0, 0, 0.1);
+            border-radius: 50%;
+            border-top-color: #007bff;
+            margin-bottom: 15px;
+            animation: spin 1s ease-in-out infinite;
+        }
+        
+        @keyframes spin {
+            to {
+                transform: rotate(360deg);
+            }
+        }
+        
+        .error-message {
+            color: #dc3545;
+            text-align: center;
+            padding: 20px;
+            font-weight: bold;
+            background-color: rgba(220, 53, 69, 0.1);
+            border-radius: 5px;
+            margin: 20px auto;
+            max-width: 80%;
+        }
+        
+        /* Rarity filters section should be deleted */
+        
+        .loading-indicator {
             display: none;
+        }
+        
+        /* Rarity filters */
+        .rarity-filters {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            align-items: center;
+            gap: 8px;
+            margin: 15px auto;
+            padding: 10px;
+            background-color: rgba(255, 255, 255, 0.8);
+            border-radius: 10px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+            max-width: 800px;
+        }
+        
+        .filter-label {
+            font-weight: bold;
+            margin-right: 10px;
+            color: #333;
+        }
+        
+        .rarity-filter-btn {
+            background-color: #f8f9fa;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            padding: 6px 12px;
+            font-size: 14px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+        
+        .rarity-filter-btn:hover {
+            background-color: #e2e6ea;
+            border-color: #dae0e5;
+        }
+        
+        .rarity-filter-btn.active {
+            background-color: #007bff;
+            color: white;
+            border-color: #007bff;
+        }
+        
+        /* Responsive adjustments for filters */
+        @media (max-width: 768px) {
+            .rarity-filters {
+                flex-direction: column;
+                align-items: stretch;
+            }
+            
+            .filter-label {
+                margin-bottom: 5px;
+                text-align: center;
+            }
         } 
