@@ -31,7 +31,7 @@ class DeckBuilder {
 
     initializeElements() {
         this.searchInput = document.getElementById('search-input');
-        this.searchInput.placeholder = '🔍 Search by name, #set-id, @set-name, $V, $GX, $EX, $VSTAR, $VMAX, $TagTeam, $Prism, $ACESPEC';
+        this.searchInput.placeholder = '🔍 Search by name, #set-id, @set-name, $subtype';
         this.searchButton = document.getElementById('search-button');
         this.searchResults = document.getElementById('search-results');
         this.deckDisplay = document.getElementById('deck-display');
@@ -104,10 +104,6 @@ class DeckBuilder {
         else if (query.startsWith('$VMAX')) {
             // VMAX cards
             return `(name:"*VMAX*" OR subtypes:"VMAX")`;
-        } 
-        else if (query.startsWith('$TagTeam')) {
-            // Tag Team cards
-            return `(name:"*Tag Team*" OR subtypes:"TAG TEAM" OR name:"*&*" AND (subtypes:"GX" OR name:"*GX"))`;
         } 
         else if (query.startsWith('$Prism')) {
             // Prism Star cards
@@ -252,11 +248,19 @@ class DeckBuilder {
                 c.set.id === card.set.id
             );
 
+            // Count how many of this card are in the deck
+            const cardCount = isInDeck ? this.deck.filter(c => 
+                c.name === card.name && 
+                c.number === card.number && 
+                c.set.id === card.set.id
+            ).length : 0;
+
             // Add buttons for adding to deck, status indicator, and TCGPlayer
             const buttonsHTML = `
                 <div class="card-buttons">
                     <div class="status-box ${isInDeck ? 'in-deck' : 'not-in-deck'}">
                         ${isInDeck ? '✔' : '❌'}
+                        ${isInDeck ? `<span class="card-count-indicator">${cardCount}</span>` : ''}
                     </div>
                     <button class="card-button" title="Add to deck">➕</button>
                     <button class="card-button tcgplayer-button" title="View on TCGPlayer">💰</button>
@@ -279,11 +283,21 @@ class DeckBuilder {
             addButton.addEventListener('click', (e) => {
                 e.stopPropagation();
                 this.addCardToDeck(card);
+                
                 // Update status box after adding card
                 const statusBox = cardElement.querySelector('.status-box');
                 statusBox.classList.remove('not-in-deck');
                 statusBox.classList.add('in-deck');
-                statusBox.textContent = '✔';
+                
+                // Count cards after adding
+                const cardCount = this.deck.filter(c => 
+                    c.name === card.name && 
+                    c.number === card.number && 
+                    c.set.id === card.set.id
+                ).length;
+                
+                // Update status box with checkmark and count
+                statusBox.innerHTML = `✔<span class="card-count-indicator">${cardCount}</span>`;
             });
 
             // Add click handler for TCGPlayer button
@@ -322,6 +336,83 @@ class DeckBuilder {
         
         if (index !== -1) {
             this.removeCardFromDeck(index);
+            
+            // After removing, check if any instances of this card remain in deck
+            const isStillInDeck = this.deck.some(c => 
+                c.name === card.name && 
+                c.number === card.number && 
+                c.set.id === card.set.id
+            );
+            
+            // Update status boxes in search results if this card is visible there
+            this.updateCardStatusInSearchResults(card, isStillInDeck);
+        }
+    }
+    
+    // New method to update card status in search results
+    updateCardStatusInSearchResults(card, isInDeck) {
+        // Find all matching cards in the search results
+        const searchResultCards = this.searchResults.querySelectorAll('.card');
+        
+        searchResultCards.forEach(cardElement => {
+            // Get the card img element to check its alt text (which contains the card name)
+            const imgElement = cardElement.querySelector('img');
+            if (!imgElement) return;
+            
+            // First do a quick name check to filter most non-matching cards
+            if (imgElement.alt !== card.name) return;
+            
+            // Find status box
+            const statusBox = cardElement.querySelector('.status-box');
+            if (!statusBox) return;
+            
+            // We need to do more than a name check - card might have multiple printings
+            // For now, assume the name match is sufficient as we can't easily get the set/number from DOM
+            // This can be improved if needed by storing data attributes
+            
+            if (isInDeck) {
+                // Count how many of this card are in the deck
+                const cardCount = this.deck.filter(c => 
+                    c.name === card.name && 
+                    c.number === card.number && 
+                    c.set.id === card.set.id
+                ).length;
+                
+                statusBox.classList.remove('not-in-deck');
+                statusBox.classList.add('in-deck');
+                
+                // Add or update count indicator
+                let countIndicator = statusBox.querySelector('.card-count-indicator');
+                if (!countIndicator) {
+                    countIndicator = document.createElement('span');
+                    countIndicator.className = 'card-count-indicator';
+                    statusBox.appendChild(countIndicator);
+                }
+                countIndicator.textContent = cardCount;
+                statusBox.innerHTML = `✔<span class="card-count-indicator">${cardCount}</span>`;
+            } else {
+                statusBox.classList.remove('in-deck');
+                statusBox.classList.add('not-in-deck');
+                statusBox.textContent = '❌';
+            }
+        });
+    }
+    
+    removeCardFromDeck(index) {
+        // Store the removed card for undo
+        const removedCard = this.deck[index];
+        this.removedCards.push(removedCard);
+        
+        // Remove only the card at the specified index
+        this.deck.splice(index, 1);
+        
+        this.updateDeckDisplay();
+        this.updateCounters();
+        
+        // Show undo button if we have removed cards
+        const undoBtn = document.getElementById('undoBtn');
+        if (undoBtn) {
+            undoBtn.style.display = this.removedCards.length > 0 ? 'block' : 'none';
         }
     }
 
@@ -503,50 +594,6 @@ class DeckBuilder {
         });
     }
 
-    removeCardFromDeck(index) {
-        // Store the removed card for undo
-        const removedCard = this.deck[index];
-        this.removedCards.push(removedCard);
-        
-        // Remove only the card at the specified index
-        this.deck.splice(index, 1);
-        
-        this.updateDeckDisplay();
-        this.updateCounters();
-        
-        // Show undo button if we have removed cards
-        const undoBtn = document.getElementById('undoBtn');
-        if (undoBtn) {
-            undoBtn.style.display = this.removedCards.length > 0 ? 'block' : 'none';
-        }
-
-        // Check if this card is now completely removed from the deck
-        const isStillInDeck = this.deck.some(c => 
-            c.name === removedCard.name && 
-            c.number === removedCard.number && 
-            c.set.id === removedCard.set.id
-        );
-
-        // Update status in search results if the card is completely removed
-        if (!isStillInDeck) {
-            // Find the card in search results and update its status
-            const searchResultCards = this.searchResults.querySelectorAll('.card');
-            searchResultCards.forEach(cardElement => {
-                // Get the card image alt text which contains the card name
-                const cardImg = cardElement.querySelector('img');
-                if (cardImg && cardImg.alt === removedCard.name) {
-                    // Update status box if this is the correct card
-                    const statusBox = cardElement.querySelector('.status-box');
-                    if (statusBox) {
-                        statusBox.classList.remove('in-deck');
-                        statusBox.classList.add('not-in-deck');
-                        statusBox.textContent = '❌';
-                    }
-                }
-            });
-        }
-    }
-
     showCardModal(imageUrl) {
         this.modalContent.innerHTML = `<img src="${imageUrl}" alt="Card preview">`;
         this.modalOverlay.classList.add('active');
@@ -559,6 +606,20 @@ class DeckBuilder {
         fileInput.accept = '.json';
         fileInput.style.display = 'none';
         document.body.appendChild(fileInput);
+
+        // Create notification element for import status
+        const importNotification = document.createElement('div');
+        importNotification.className = 'import-notification';
+        importNotification.style.position = 'fixed';
+        importNotification.style.top = '20px';
+        importNotification.style.right = '20px';
+        importNotification.style.padding = '10px 15px';
+        importNotification.style.borderRadius = '5px';
+        importNotification.style.fontWeight = 'bold';
+        importNotification.style.display = 'none';
+        importNotification.style.zIndex = '1000';
+        importNotification.style.transition = 'opacity 0.5s ease-in-out';
+        document.body.appendChild(importNotification);
 
         document.getElementById('exportBtn').addEventListener('click', () => {
             const deckData = JSON.stringify(this.deck, null, 2);
@@ -578,6 +639,23 @@ class DeckBuilder {
             fileInput.click();
         });
 
+        // Show import status notification
+        const showImportNotification = (success, message) => {
+            importNotification.textContent = success ? '✓ ' + message : '✗ ' + message;
+            importNotification.style.backgroundColor = success ? '#4CAF50' : '#F44336';
+            importNotification.style.color = 'white';
+            importNotification.style.display = 'block';
+            importNotification.style.opacity = '1';
+            
+            // Hide the notification after 3 seconds
+            setTimeout(() => {
+                importNotification.style.opacity = '0';
+                setTimeout(() => {
+                    importNotification.style.display = 'none';
+                }, 500);
+            }, 3000);
+        };
+
         fileInput.addEventListener('change', (event) => {
             const file = event.target.files[0];
             if (file) {
@@ -585,11 +663,22 @@ class DeckBuilder {
                 reader.onload = (e) => {
                     try {
                         const importedDeck = JSON.parse(e.target.result);
+                        
+                        // Validate the imported data
+                        if (!Array.isArray(importedDeck)) {
+                            throw new Error('Invalid deck format');
+                        }
+                        
                         this.deck = importedDeck;
                         this.updateDeckDisplay();
                         this.updateCounters();
+                        this.updateSortButtonVisibility();
+                        
+                        // Show success notification
+                        showImportNotification(true, 'Deck imported successfully');
                     } catch (error) {
-                        alert('Error importing deck: Invalid file format');
+                        // Show error notification
+                        showImportNotification(false, 'Error importing deck: Invalid file format');
                     }
                 };
                 reader.readAsText(file);
@@ -716,27 +805,14 @@ class DeckBuilder {
             this.updateDeckDisplay();
             this.updateCounters();
             
+            // Update status indicators in search results
+            this.updateCardStatusInSearchResults(cardToRestore, true);
+            
             // Hide undo button if no more cards to restore
             const undoBtn = document.getElementById('undoBtn');
             if (undoBtn && this.removedCards.length === 0) {
                 undoBtn.style.display = 'none';
             }
-
-            // Update status in search results for the restored card
-            const searchResultCards = this.searchResults.querySelectorAll('.card');
-            searchResultCards.forEach(cardElement => {
-                // Get the card image alt text which contains the card name
-                const cardImg = cardElement.querySelector('img');
-                if (cardImg && cardImg.alt === cardToRestore.name) {
-                    // Update status box if this is the correct card
-                    const statusBox = cardElement.querySelector('.status-box');
-                    if (statusBox) {
-                        statusBox.classList.remove('not-in-deck');
-                        statusBox.classList.add('in-deck');
-                        statusBox.textContent = '✔';
-                    }
-                }
-            });
         }
     }
 
@@ -914,6 +990,16 @@ class DeckBuilder {
         const tcgPlayerUrl = `https://www.tcgplayer.com/search/pokemon/${card.set.name.toLowerCase()}?q=${searchQuery}&productLineName=pokemon`;
         window.open(tcgPlayerUrl, '_blank');
     }
+
+    resetAllCardStatus() {
+        // Find all status boxes in search results and reset them to ❌
+        const statusBoxes = this.searchResults.querySelectorAll('.status-box');
+        statusBoxes.forEach(statusBox => {
+            statusBox.classList.remove('in-deck');
+            statusBox.classList.add('not-in-deck');
+            statusBox.innerHTML = '❌';
+        });
+    }
 }
 
 // Initialize the deck builder when the page loads
@@ -922,10 +1008,17 @@ document.addEventListener('DOMContentLoaded', () => {
     
     document.getElementById('clearBtn').addEventListener('click', () => {
         if (confirm('Are you sure you want to clear your deck? This action cannot be undone.')) {
+            // Store the cards being removed
+            const removedCards = [...deckBuilder.deck];
+            
+            // Clear the deck
             deckBuilder.deck = [];
             deckBuilder.updateDeckDisplay();
             deckBuilder.updateCounters();
             deckBuilder.updateSortButtonVisibility();
+            
+            // Update all card status indicators in search results
+            deckBuilder.resetAllCardStatus();
         }
     });
 }); 
