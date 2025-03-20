@@ -441,10 +441,15 @@
         }
         
         .modal-content {
-            max-width: 90%;
-            max-height: 90%;
-            overflow: hidden;
+            background-color: #fff;
             padding: 30px;
+            border-radius: 15px;
+            max-width: 90%;
+            width: 500px;
+            position: relative;
+            box-shadow: 0 5px 30px rgba(0,0,0,0.3);
+            transform: translateY(20px);
+            transition: transform 0.3s ease-out;
         }
         
         .modal-content img {
@@ -980,4 +985,48 @@
         
         .card:hover .rarity-badge {
             transform: scale(1.05);
+        }
+        
+        /* Export Options Styles */
+        .export-options {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+            width: 100%;
+        }
+        
+        .export-options h3 {
+            text-align: center;
+            color: var(--pokemon-blue);
+            margin-bottom: 10px;
+            font-size: 1.6rem;
+        }
+        
+        .export-options button {
+            padding: 12px 20px;
+            border: none;
+            border-radius: 8px;
+            font-size: 1rem;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+        
+        #exportFull {
+            background: linear-gradient(135deg, var(--pokemon-blue), #2a3899);
+            color: white;
+        }
+        
+        #exportSimple {
+            background: linear-gradient(135deg, var(--pokemon-yellow), #e5c700);
+            color: #333;
+        }
+        
+        .export-options button:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 4px 10px rgba(0,0,0,0.2);
+        }
+        
+        .export-options button:active {
+            transform: translateY(0);
         } 

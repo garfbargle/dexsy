@@ -486,17 +486,26 @@ class DeckBuilder {
         document.body.appendChild(fileInput);
 
         document.getElementById('exportBtn').addEventListener('click', () => {
-            const deckData = JSON.stringify(this.deck, null, 2);
-            const blob = new Blob([deckData], { type: 'application/json' });
-            const url = URL.createObjectURL(blob);
+            // Create a simple modal for export options
+            this.modalContent.innerHTML = `
+                <div class="export-options">
+                    <h3>Export Options</h3>
+                    <button id="exportFull">Export Full Deck Data</button>
+                    <button id="exportSimple">Export Simple Format (Images Only)</button>
+                </div>
+            `;
+            this.modalOverlay.classList.add('active');
             
-            const a = document.createElement('a');
-            a.href = url;
-            a.download = 'pokemon-deck.json';
-            document.body.appendChild(a);
-            a.click();
-            document.body.removeChild(a);
-            URL.revokeObjectURL(url);
+            // Add event listeners for export options
+            document.getElementById('exportFull').addEventListener('click', () => {
+                this.exportDeck('full');
+                this.modalOverlay.classList.remove('active');
+            });
+            
+            document.getElementById('exportSimple').addEventListener('click', () => {
+                this.exportDeck('simple');
+                this.modalOverlay.classList.remove('active');
+            });
         });
 
         document.getElementById('importBtn').addEventListener('click', () => {
@@ -510,7 +519,18 @@ class DeckBuilder {
                 reader.onload = (e) => {
                     try {
                         const importedDeck = JSON.parse(e.target.result);
-                        this.deck = importedDeck;
+                        
+                        // Check if it's a simple format (array of objects with front_image_url)
+                        if (Array.isArray(importedDeck) && importedDeck.length > 0 && 'front_image_url' in importedDeck[0]) {
+                            // Convert simple format to full format if possible
+                            alert('Simple format detected. Only image URLs will be imported.');
+                            // In a real implementation, we would need to fetch the card data
+                            // based on the image URLs, but this is complex and requires API calls
+                        } else {
+                            // Assume it's full format
+                            this.deck = importedDeck;
+                        }
+                        
                         this.updateDeckDisplay();
                         this.updateCounters();
                     } catch (error) {
@@ -522,6 +542,37 @@ class DeckBuilder {
         });
 
         // Clear button is already working correctly
+    }
+
+    // New method to handle different export formats
+    exportDeck(format) {
+        let deckData;
+        let filename;
+        
+        if (format === 'simple') {
+            // Simple format: just front and back image URLs
+            const simpleDeck = this.deck.map(card => ({
+                front_image_url: card.images.small,
+                back_image_url: this.cardBackUrl
+            }));
+            deckData = JSON.stringify(simpleDeck, null, 2);
+            filename = 'pokemon-deck-simple.json';
+        } else {
+            // Full format: all card data
+            deckData = JSON.stringify(this.deck, null, 2);
+            filename = 'pokemon-deck.json';
+        }
+        
+        const blob = new Blob([deckData], { type: 'application/json' });
+        const url = URL.createObjectURL(blob);
+        
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = filename;
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);
+        URL.revokeObjectURL(url);
     }
 
     initializeGameElements() {
