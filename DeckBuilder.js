@@ -2,6 +2,7 @@ class DeckBuilder {
     constructor() {
         this.deck = [];
         this.removedCards = [];  // Track removed cards for undo
+        this.sets = [];  // Add sets storage
         this.initializeElements();
         this.setupEventListeners();
         
@@ -22,11 +23,11 @@ class DeckBuilder {
         this.hasMoreResults = true;
         this.lastSearchQuery = '';
 
-        // Add initial search for Base Set
-        this.initialBaseSetSearch();
-
         // Initialize sort button visibility
         this.updateSortButtonVisibility();
+
+        // Load sets and then do initial search
+        this.loadSetsAndInitialize();
     }
 
     initializeElements() {
@@ -700,24 +701,44 @@ class DeckBuilder {
         }
     }
 
+    async loadSetsAndInitialize() {
+        try {
+            await this.createSetSuggestions();
+            // After sets are loaded, do initial search for Base Set
+            this.initialBaseSetSearch();
+        } catch (error) {
+            console.error('Error during initialization:', error);
+            // Show error message to user
+            alert('Failed to load set data. Please refresh the page to try again.');
+        }
+    }
+
     async createSetSuggestions() {
         try {
-            // Fetch sets from the Pokémon TCG API instead of local file
+            // Fetch sets from the Pokémon TCG API
             const response = await fetch('https://api.pokemontcg.io/v2/sets');
+            if (!response.ok) {
+                throw new Error(`HTTP error! status: ${response.status}`);
+            }
             const data = await response.json();
             
-            // Sort sets by release date (newest first)
-            const sortedSets = data.data.sort((a, b) => 
+            // Store sets data for future use
+            this.sets = data.data.sort((a, b) => 
                 new Date(b.releaseDate) - new Date(a.releaseDate)
             );
             
             // Create datalist element
+            const existingDatalist = document.getElementById('set-suggestions');
+            if (existingDatalist) {
+                existingDatalist.remove();
+            }
+
             const datalist = document.createElement('datalist');
             datalist.id = 'set-suggestions';
             
             // Add suggestions for both set IDs and names
-            sortedSets.forEach(set => {
-                // Add set ID suggestion with # prefix (without -1)
+            this.sets.forEach(set => {
+                // Add set ID suggestion with # prefix
                 const idOption = document.createElement('option');
                 idOption.value = `#${set.id}`;
                 idOption.label = `${set.name} (${set.series}) - ID Search`;
@@ -738,10 +759,11 @@ class DeckBuilder {
             
         } catch (error) {
             console.error('Error loading set suggestions:', error);
+            throw new Error('Failed to load set data from the API');
         }
     }
 
-    // Add new method for initial Base Set search
+    // Remove initialBaseSetSearch method since it's now called after sets are loaded
     initialBaseSetSearch() {
         // Set the search input value to "#base1"
         this.searchInput.value = "#base1";
