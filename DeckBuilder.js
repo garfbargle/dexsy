@@ -22,6 +22,7 @@ class DeckBuilder {
         this.isLoading = false;
         this.hasMoreResults = true;
         this.lastSearchQuery = '';
+        this.currentSortOption = 'setOrder';
 
         // Initialize sort button visibility
         this.updateSortButtonVisibility();
@@ -34,6 +35,7 @@ class DeckBuilder {
         this.searchInput = document.getElementById('search-input');
         this.searchInput.placeholder = '🔍 Search by name, #set-id (#sv1), or @set-name (@Scarlet)';
         this.searchButton = document.getElementById('search-button');
+        this.sortSelect = document.getElementById('sort-select');
         this.searchResults = document.getElementById('search-results');
         this.deckDisplay = document.getElementById('deck-display');
         this.counters = {
@@ -53,6 +55,15 @@ class DeckBuilder {
         this.searchInput.addEventListener('keypress', (e) => {
             if (e.key === 'Enter' && this.searchInput.value.trim()) {
                 this.searchCards();
+            }
+        });
+        
+        // Add sort select change listener
+        this.sortSelect.addEventListener('change', () => {
+            this.currentSortOption = this.sortSelect.value;
+            if (this.searchResults.children.length > 0) {
+                // Re-sort current results
+                this.sortSearchResults(Array.from(this.searchResults.querySelectorAll('.card')));
             }
         });
         
@@ -166,9 +177,20 @@ class DeckBuilder {
             this.searchResults.innerHTML = '';
         }
 
-        cards.forEach(card => {
+        // Sort the cards based on the current sort option
+        const sortedCards = this.sortCards(cards);
+
+        sortedCards.forEach(card => {
             const cardElement = document.createElement('div');
             cardElement.className = 'card';
+            
+            // Store card data for sorting purposes
+            cardElement.dataset.cardData = JSON.stringify({
+                name: card.name,
+                number: card.number,
+                setId: card.set.id,
+                price: this.getCardPriceData(card).price || 0
+            });
             
             // Create image element with card back as placeholder
             const img = document.createElement('img');
@@ -237,6 +259,86 @@ class DeckBuilder {
             });
 
             this.searchResults.appendChild(cardElement);
+        });
+
+        // If appending, re-sort all cards to maintain consistent sorting
+        if (append) {
+            this.sortSearchResults(Array.from(this.searchResults.querySelectorAll('.card')));
+        }
+    }
+
+    // New method to sort cards based on current sort option
+    sortCards(cards) {
+        const sortedCards = [...cards];
+
+        switch (this.currentSortOption) {
+            case 'priceLow':
+                sortedCards.sort((a, b) => {
+                    const priceA = this.getCardPriceData(a).price || 0;
+                    const priceB = this.getCardPriceData(b).price || 0;
+                    return priceA - priceB;
+                });
+                break;
+            case 'priceHigh':
+                sortedCards.sort((a, b) => {
+                    const priceA = this.getCardPriceData(a).price || 0;
+                    const priceB = this.getCardPriceData(b).price || 0;
+                    return priceB - priceA;
+                });
+                break;
+            case 'setOrder':
+            default:
+                // Default is set order (already in order from API)
+                break;
+        }
+
+        return sortedCards;
+    }
+
+    // New method to sort existing DOM elements
+    sortSearchResults(cardElements) {
+        // Convert NodeList to Array to use sort
+        const sortedElements = [...cardElements];
+        
+        switch (this.currentSortOption) {
+            case 'priceLow':
+                sortedElements.sort((a, b) => {
+                    const dataA = JSON.parse(a.dataset.cardData || '{}');
+                    const dataB = JSON.parse(b.dataset.cardData || '{}');
+                    return (dataA.price || 0) - (dataB.price || 0);
+                });
+                break;
+            case 'priceHigh':
+                sortedElements.sort((a, b) => {
+                    const dataA = JSON.parse(a.dataset.cardData || '{}');
+                    const dataB = JSON.parse(b.dataset.cardData || '{}');
+                    return (dataB.price || 0) - (dataA.price || 0);
+                });
+                break;
+            case 'setOrder':
+                sortedElements.sort((a, b) => {
+                    const dataA = JSON.parse(a.dataset.cardData || '{}');
+                    const dataB = JSON.parse(b.dataset.cardData || '{}');
+                    
+                    // First compare set IDs
+                    if (dataA.setId !== dataB.setId) {
+                        return dataA.setId.localeCompare(dataB.setId);
+                    }
+                    
+                    // If same set, compare by card number
+                    const numA = parseInt(dataA.number) || 0;
+                    const numB = parseInt(dataB.number) || 0;
+                    return numA - numB;
+                });
+                break;
+            default:
+                return;
+        }
+        
+        // Clear and reappend in sorted order
+        const parent = this.searchResults;
+        sortedElements.forEach(element => {
+            parent.appendChild(element);
         });
     }
 
