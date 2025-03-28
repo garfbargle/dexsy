@@ -238,11 +238,18 @@ class DeckBuilder {
                 }
             });
 
-            // Add click handler for add button
-            const addButton = cardElement.querySelector('.card-button');
-            addButton.addEventListener('click', (e) => {
+            // Add click handler for decrease button
+            const decreaseButton = cardElement.querySelector('.decrease-button');
+            decreaseButton.addEventListener('click', (e) => {
                 e.stopPropagation();
-                this.addCardToDeck(card);
+                this.decreaseCardQuantity(card);
+            });
+
+            // Add click handler for increase button
+            const increaseButton = cardElement.querySelector('.increase-button');
+            increaseButton.addEventListener('click', (e) => {
+                e.stopPropagation();
+                this.increaseCardQuantity(card);
             });
 
             // Add click handler for price badge
