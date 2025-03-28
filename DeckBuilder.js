@@ -225,11 +225,10 @@ class DeckBuilder {
                 </div>
             `;
 
-            // Add buttons for adding to deck and TCGPlayer
+            // Add buttons for adding to deck (removed TCGPlayer button)
             const buttonsHTML = `
                 <div class="card-buttons">
                     <button class="card-button" title="Add to deck">➕</button>
-                    <button class="card-button tcgplayer-button" title="View on TCGPlayer">💰</button>
                 </div>
                 ${priceHTML}
                 ${rarityHTML}
@@ -240,24 +239,29 @@ class DeckBuilder {
 
             // Add click handler for card zoom
             cardElement.addEventListener('click', (e) => {
-                if (!e.target.classList.contains('card-button')) {
+                if (!e.target.classList.contains('card-button') && 
+                    !e.target.closest('.price-badge')) {
                     this.showCardModal(card.images.large || card.images.small);
                 }
             });
 
             // Add click handler for add button
-            const addButton = cardElement.querySelector('.card-button:not(.tcgplayer-button)');
+            const addButton = cardElement.querySelector('.card-button');
             addButton.addEventListener('click', (e) => {
                 e.stopPropagation();
                 this.addCardToDeck(card);
             });
 
-            // Add click handler for TCGPlayer button
-            const tcgPlayerButton = cardElement.querySelector('.tcgplayer-button');
-            tcgPlayerButton.addEventListener('click', (e) => {
-                e.stopPropagation();
-                this.openTCGPlayer(card);
-            });
+            // Add click handler for price badge
+            const priceBadge = cardElement.querySelector('.price-badge');
+            if (priceBadge) {
+                priceBadge.style.cursor = 'pointer';
+                priceBadge.title = "View on TCGPlayer";
+                priceBadge.addEventListener('click', (e) => {
+                    e.stopPropagation();
+                    this.openTCGPlayer(card);
+                });
+            }
 
             this.searchResults.appendChild(cardElement);
         });
@@ -455,12 +459,11 @@ class DeckBuilder {
                 </div>
             `;
 
-            // Add buttons for quantity control and TCGPlayer
+            // Add buttons for quantity control (removed TCGPlayer button)
             const buttonsHTML = `
                 <div class="card-buttons">
                     <button class="card-button decrease-button" title="Decrease quantity">➖</button>
                     <button class="card-button increase-button" title="Increase quantity">➕</button>
-                    <button class="card-button tcgplayer-button" title="View on TCGPlayer">💰</button>
                 </div>
                 ${priceHTML}
                 ${rarityHTML}
@@ -472,7 +475,8 @@ class DeckBuilder {
 
             // Add click handler for card zoom
             cardElement.addEventListener('click', (e) => {
-                if (!e.target.classList.contains('card-button')) {
+                if (!e.target.classList.contains('card-button') && 
+                    !e.target.closest('.price-badge')) {
                     this.showCardModal(card.images.large || card.images.small);
                 }
             });
@@ -491,12 +495,16 @@ class DeckBuilder {
                 this.increaseCardQuantity(card);
             });
 
-            // Add click handler for TCGPlayer button
-            const tcgPlayerButton = cardElement.querySelector('.tcgplayer-button');
-            tcgPlayerButton.addEventListener('click', (e) => {
-                e.stopPropagation();
-                this.openTCGPlayer(card);
-            });
+            // Add click handler for price badge
+            const priceBadge = cardElement.querySelector('.price-badge');
+            if (priceBadge) {
+                priceBadge.style.cursor = 'pointer';
+                priceBadge.title = "View on TCGPlayer";
+                priceBadge.addEventListener('click', (e) => {
+                    e.stopPropagation();
+                    this.openTCGPlayer(card);
+                });
+            }
 
             this.deckDisplay.appendChild(cardElement);
         });

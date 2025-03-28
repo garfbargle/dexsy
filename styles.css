@@ -8,6 +8,9 @@
             --text-color: #FFFFFF;
             --pokemon-yellow: #FEE74C;
             --pokemon-blue: #3A57D0;
+            --pokemon-red: #FF3860;
+            --pokeball-red: #EE1515;
+            --pokeball-white: #F0F0F0;
             --gradient-start: #5865F2;
             --gradient-end: #EB459E;
             --glass-border: rgba(255, 255, 255, 0.1);
@@ -100,71 +103,99 @@
         
         .deck-controls-container {
             display: flex;
-            justify-content: space-between;
-            background: linear-gradient(135deg, rgba(88, 101, 242, 0.5), rgba(235, 69, 158, 0.5));
+            flex-direction: column;
+            background: linear-gradient(135deg, rgba(58, 87, 208, 0.7), rgba(238, 21, 21, 0.5));
             padding: 18px 22px;
             border-radius: 20px;
             margin-bottom: 30px;
-            box-shadow: var(--glass-shadow);
+            box-shadow: var(--glass-shadow), 0 0 15px rgba(254, 231, 76, 0.3);
             backdrop-filter: blur(12px);
             -webkit-backdrop-filter: blur(12px);
-            border: 1px solid var(--glass-border);
+            border: 2px solid var(--pokemon-yellow);
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .deck-controls-container::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-image: 
+                radial-gradient(circle at 75% 25%, rgba(254, 231, 76, 0.15) 0%, transparent 50%),
+                radial-gradient(circle at 25% 75%, rgba(238, 21, 21, 0.1) 0%, transparent 50%);
+            z-index: -1;
         }
         
         .deck-stats {
-            display: flex;
-            flex-direction: row;
-            gap: 15px;
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+            gap: 12px;
             color: white;
-            padding: 10px;
-            background: rgba(0, 0, 0, 0.15);
+            padding: 12px;
+            background: rgba(0, 0, 0, 0.2);
             border-radius: 15px;
-            border: 1px solid rgba(255, 255, 255, 0.1);
-            flex-wrap: nowrap;
-            align-items: center;
+            border: 1px solid rgba(255, 255, 255, 0.15);
             backdrop-filter: blur(5px);
             -webkit-backdrop-filter: blur(5px);
+            margin-bottom: 15px;
         }
         
         .stat {
-            display: grid;
-            grid-template-columns: auto 1fr auto;
-            gap: 12px;
+            display: flex;
             align-items: center;
-            padding: 10px 16px;
-            background: rgba(255, 255, 255, 0.08);
+            padding: 10px 12px;
+            background: rgba(0, 0, 0, 0.25);
             border-radius: 12px;
             transition: all 0.3s ease;
             font-weight: 600;
-            font-size: 1.1rem;
-            text-shadow: none;
-            border: 1px solid rgba(255, 255, 255, 0.05);
-            min-width: 160px;
+            font-size: 0.95rem;
+            text-shadow: 0 1px 2px rgba(0, 0, 0, 0.3);
+            border: 1px solid rgba(255, 255, 255, 0.1);
             backdrop-filter: blur(5px);
             -webkit-backdrop-filter: blur(5px);
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .stat::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 2px;
+            background: linear-gradient(to right, var(--pokemon-yellow), transparent);
+            opacity: 0.7;
         }
         
         .stat:hover {
             transform: translateY(-5px);
-            background: rgba(255, 255, 255, 0.15);
+            background: rgba(238, 21, 21, 0.25);
             box-shadow: 0 8px 16px rgba(0, 0, 0, 0.15);
         }
         
         .stat i {
-            font-size: 1.4rem;
-            width: 30px;
+            font-size: 1.2rem;
+            width: 24px;
             text-align: center;
             color: var(--pokemon-yellow);
+            margin-right: 8px;
+            text-shadow: 0 0 8px rgba(254, 231, 76, 0.5);
         }
         
         .stat span {
-            background: rgba(0, 0, 0, 0.25);
-            padding: 4px 10px;
+            background: rgba(58, 87, 208, 0.4);
+            padding: 3px 8px;
             border-radius: 12px;
-            font-size: 1rem;
+            font-size: 0.9rem;
             min-width: 30px;
             text-align: center;
-            border: 1px solid rgba(255, 255, 255, 0.1);
+            border: 1px solid rgba(255, 255, 255, 0.15);
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+            margin-left: auto;
         }
         
         .deck-display {
@@ -401,6 +432,33 @@
             nav ul {
                 display: none;
             }
+            
+            .stat {
+                font-size: 0.85rem;
+                padding: 8px 10px;
+            }
+            
+            .stat i {
+                font-size: 1rem;
+                width: 20px;
+                margin-right: 6px;
+            }
+            
+            .stat span {
+                font-size: 0.8rem;
+                padding: 2px 6px;
+            }
+        }
+        
+        @media (max-width: 480px) {
+            .deck-stats {
+                grid-template-columns: repeat(2, 1fr);
+            }
+            
+            .button-container {
+                justify-content: center;
+                flex-wrap: wrap;
+            }
         }
         
         .card button {
@@ -593,18 +651,6 @@
             color: var(--accent-color);
         }
         
-        .card-button.tcgplayer-button {
-            color: var(--pokemon-yellow);
-            font-size: 16px;
-            border-left: 1px solid rgba(255, 255, 255, 0.1);
-            padding-left: 8px;
-        }
-        
-        .card-button.tcgplayer-button:hover {
-            color: var(--pokemon-yellow);
-            background: rgba(254, 231, 76, 0.15);
-        }
-        
         .card-count {
             position: absolute;
             top: 10px;
@@ -684,37 +730,43 @@
         .button-container {
             display: flex;
             gap: 12px;
-            justify-content: flex-end;
+            justify-content: center;
             align-items: center;
-            padding-left: 20px;
-            border-left: 2px solid rgba(255, 255, 255, 0.1);
+            padding-top: 5px;
+            border-top: 2px solid rgba(255, 255, 255, 0.1);
         }
         
         .button-container button {
             padding: 0;
             border: none;
             border-radius: 50%;
-            background: rgba(255, 255, 255, 0.08);
+            background: rgba(0, 0, 0, 0.3);
             cursor: pointer;
             transition: all 0.3s ease;
             font-size: 1.2rem;
-            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
-            width: 48px;
-            height: 48px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.25), inset 0 -2px 5px rgba(0, 0, 0, 0.3);
+            width: 42px;
+            height: 42px;
             display: flex;
             align-items: center;
             justify-content: center;
             line-height: 1;
             backdrop-filter: blur(5px);
             -webkit-backdrop-filter: blur(5px);
-            border: 1px solid rgba(255, 255, 255, 0.05);
+            border: 2px solid rgba(255, 255, 255, 0.15);
+            position: relative;
+            overflow: hidden;
         }
         
-        .button-container button:hover {
-            transform: translateY(-5px);
-            box-shadow: 0 8px 20px rgba(88, 101, 242, 0.3);
-            background: rgba(255, 255, 255, 0.15);
-            border-color: rgba(255, 255, 255, 0.2);
+        .button-container button::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 50%;
+            background: linear-gradient(to bottom, rgba(255, 255, 255, 0.2), transparent);
+            border-radius: 50% 50% 0 0;
         }
         
         .button-container button::after {
@@ -724,7 +776,7 @@
             left: 50%;
             transform: translateX(-50%);
             padding: 6px 12px;
-            background: rgba(0, 0, 0, 0.7);
+            background: rgba(58, 87, 208, 0.8);
             color: white;
             border-radius: 8px;
             font-size: 12px;
@@ -735,12 +787,21 @@
             margin-top: 8px;
             backdrop-filter: blur(5px);
             -webkit-backdrop-filter: blur(5px);
-            border: 1px solid rgba(255, 255, 255, 0.05);
+            border: 1px solid var(--pokemon-yellow);
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
+            text-shadow: 0 1px 2px rgba(0, 0, 0, 0.5);
         }
         
         .button-container button:hover::after {
             opacity: 1;
             visibility: visible;
+        }
+        
+        .button-container button:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.3);
+            background: var(--pokeball-red);
+            border-color: var(--pokemon-yellow);
         }
         
         .card-details {
@@ -1030,10 +1091,28 @@
             transition: all 0.2s ease;
             backdrop-filter: blur(5px);
             -webkit-backdrop-filter: blur(5px);
+            cursor: pointer;
+        }
+        
+        .price-badge:hover {
+            transform: translateY(-2px) scale(1.05);
+            background: rgba(88, 101, 242, 0.9);
+            box-shadow: 0 6px 12px rgba(88, 101, 242, 0.4);
+            border-color: rgba(255, 255, 255, 0.5);
+        }
+        
+        .price-badge:active {
+            transform: translateY(0) scale(0.98);
+            box-shadow: 0 2px 8px rgba(88, 101, 242, 0.3);
+        }
+        
+        .price-badge::after {
+            content: '💰';
+            margin-left: 5px;
+            font-size: 10px;
         }
         
         .card:hover .price-badge {
-            transform: scale(1.05);
             background: rgba(88, 101, 242, 0.9);
             box-shadow: 0 6px 12px rgba(88, 101, 242, 0.4);
         }
@@ -1190,4 +1269,24 @@
         
         #search-button i {
             margin-right: 5px;
+        }
+        
+        @media (min-width: 768px) {
+            .deck-controls-container {
+                flex-direction: row;
+                justify-content: space-between;
+                align-items: center;
+            }
+            
+            .deck-stats {
+                margin-bottom: 0;
+                grid-template-columns: repeat(5, 1fr);
+            }
+            
+            .button-container {
+                padding-top: 0;
+                padding-left: 15px;
+                border-top: none;
+                border-left: 2px solid rgba(255, 255, 255, 0.1);
+            }
         } 
