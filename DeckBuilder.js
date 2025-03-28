@@ -27,8 +27,12 @@ class DeckBuilder {
         // Initialize sort button visibility
         this.updateSortButtonVisibility();
 
-        // Load sets and then do initial search
-        this.loadSetsAndInitialize();
+        // Make immediate search for base1 directly without waiting
+        this.searchInput.value = "#base1";
+        this.initialBaseSetSearch();
+        
+        // Load sets for suggestions in the background
+        this.loadSetsInBackground();
     }
 
     initializeElements() {
@@ -45,9 +49,6 @@ class DeckBuilder {
             trainer: document.getElementById('trainer-count'),
             price: document.getElementById('price-count')
         };
-        
-        // Add datalist for set suggestions
-        this.createSetSuggestions();
     }
 
     setupEventListeners() {
@@ -803,11 +804,10 @@ class DeckBuilder {
         }
     }
 
-    async loadSetsAndInitialize() {
+    // Modify loadSetsAndInitialize to loadSetsInBackground
+    async loadSetsInBackground() {
         try {
             await this.createSetSuggestions();
-            // After sets are loaded, do initial search for Base Set
-            this.initialBaseSetSearch();
         } catch (error) {
             console.error('Error during initialization:', error);
             // Show error message to user
@@ -863,14 +863,6 @@ class DeckBuilder {
             console.error('Error loading set suggestions:', error);
             throw new Error('Failed to load set data from the API');
         }
-    }
-
-    // Remove initialBaseSetSearch method since it's now called after sets are loaded
-    initialBaseSetSearch() {
-        // Set the search input value to "#base1"
-        this.searchInput.value = "#base1";
-        // Trigger the search
-        this.searchCards();
     }
 
     // Add new method for sorting the deck
@@ -947,6 +939,28 @@ class DeckBuilder {
         const searchQuery = encodeURIComponent(`${card.name} ${card.set.name}`);
         const tcgPlayerUrl = `https://www.tcgplayer.com/search/pokemon/${card.set.name.toLowerCase()}?q=${searchQuery}&productLineName=pokemon`;
         window.open(tcgPlayerUrl, '_blank');
+    }
+
+    // Add direct search method for initialization
+    initialBaseSetSearch() {
+        const baseSetQuery = "set.id:\"base1\"";
+        
+        this.isLoading = true;
+        this.lastSearchQuery = "#base1";
+        this.currentPage = 1;
+        
+        fetch(`https://api.pokemontcg.io/v2/cards?q=${baseSetQuery}&page=1&pageSize=20`)
+            .then(response => response.json())
+            .then(data => {
+                this.hasMoreResults = data.data.length === 20;
+                this.displaySearchResults(data.data, false);
+            })
+            .catch(error => {
+                console.error('Error in initial search:', error);
+            })
+            .finally(() => {
+                this.isLoading = false;
+            });
     }
 }
 
