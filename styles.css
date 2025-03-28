@@ -1,14 +1,19 @@
         /* Add your CSS styles here */
         :root {
-            --primary-color: #FF0000;
-            --secondary-color: #CC0000;
-            --background-color: #f0f0f0;
-            --card-bg: #ffffff;
-            --text-color: #333333;
-            --pokemon-yellow: #FFDE00;
-            --pokemon-blue: #3B4CCA;
-            --gradient-start: #FF0000;
-            --gradient-end: #CC0000;
+            --primary-color: #5865F2; /* Modern Pokémon blue */
+            --secondary-color: #EB459E; /* Modern Pokémon pink */
+            --accent-color: #57F287; /* Modern accent green */
+            --background-color: #8a24a1; /* Darker background */
+            --card-bg: rgba(255, 255, 255, 0.08); /* Glass card background */
+            --text-color: #FFFFFF;
+            --pokemon-yellow: #FEE74C;
+            --pokemon-blue: #3A57D0;
+            --gradient-start: #5865F2;
+            --gradient-end: #EB459E;
+            --glass-border: rgba(255, 255, 255, 0.1);
+            --glass-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.37);
+            --card-hover-shadow: 0 10px 25px rgba(82, 98, 240, 0.5);
+            --font-family: 'Inter', 'Segoe UI', system-ui, sans-serif;
         }
         
         * {
@@ -18,16 +23,16 @@
         }
         
         body {
-            font-family: 'Segoe UI', system-ui, sans-serif;
+            font-family: var(--font-family);
             line-height: 1.6;
             padding: 20px;
+            color: var(--text-color);
             background-color: var(--background-color);
-            background-image: linear-gradient(45deg, #f0f0f0 25%, transparent 25%),
-                              linear-gradient(-45deg, #f0f0f0 25%, transparent 25%),
-                              linear-gradient(45deg, transparent 75%, #f0f0f0 75%),
-                              linear-gradient(-45deg, transparent 75%, #f0f0f0 75%);
-            background-size: 20px 20px;
-            background-position: 0 0, 0 10px, 10px -10px, -10px 0px;
+            background-image: 
+                radial-gradient(circle at 15% 50%, rgba(88, 101, 242, 0.15) 0%, transparent 40%),
+                radial-gradient(circle at 85% 30%, rgba(235, 69, 158, 0.1) 0%, transparent 50%);
+            background-attachment: fixed;
+            background-size: cover;
         }
         
         .container {
@@ -38,40 +43,87 @@
         h1 {
             text-align: center;
             margin: 20px 0;
-            color: var(--pokemon-blue);
-            font-size: 2.5rem;
-            text-shadow: 2px 2px var(--pokemon-yellow);
+            color: var(--text-color);
+            font-size: 3rem;
+            font-weight: 800;
+            background: linear-gradient(90deg, var(--pokemon-yellow), var(--secondary-color));
+            -webkit-background-clip: text;
+            background-clip: text;
+            -webkit-text-fill-color: transparent;
+            text-shadow: none;
+            letter-spacing: -1px;
+        }
+        
+        h1 i {
+            font-size: 0.9em;
+            margin-right: 5px;
+            background: linear-gradient(90deg, var(--pokemon-yellow), var(--secondary-color));
+            -webkit-background-clip: text;
+            background-clip: text;
+            -webkit-text-fill-color: transparent;
         }
         
         h2 {
             text-align: center;
             margin: 10px 0 20px 0;
-            color: var(--pokemon-blue);
+            color: var(--text-color);
             font-size: 1.8rem;
-            text-shadow: 2px 2px var(--pokemon-yellow);
+            font-weight: 600;
+            text-shadow: none;
+            opacity: 0.8;
+        }
+        
+        /* Empty state styling */
+        .empty-state {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            grid-column: 1 / -1;
+            height: 200px;
+            color: rgba(255, 255, 255, 0.3);
+            padding: 20px;
+            text-align: center;
+        }
+        
+        .empty-state i {
+            font-size: 3rem;
+            margin-bottom: 15px;
+            opacity: 0.5;
+            color: var(--primary-color);
+        }
+        
+        .empty-state p {
+            font-size: 1.2rem;
+            font-weight: 500;
         }
         
         .deck-controls-container {
             display: flex;
             justify-content: space-between;
-            background: linear-gradient(135deg, var(--gradient-start), var(--gradient-end));
-            padding: 15px;
-            border-radius: 15px;
-            margin-bottom: 20px;
-            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+            background: linear-gradient(135deg, rgba(88, 101, 242, 0.5), rgba(235, 69, 158, 0.5));
+            padding: 18px 22px;
+            border-radius: 20px;
+            margin-bottom: 30px;
+            box-shadow: var(--glass-shadow);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            border: 1px solid var(--glass-border);
         }
         
         .deck-stats {
             display: flex;
             flex-direction: row;
-            gap: 10px;
+            gap: 15px;
             color: white;
             padding: 10px;
             background: rgba(0, 0, 0, 0.15);
-            border-radius: 10px;
+            border-radius: 15px;
             border: 1px solid rgba(255, 255, 255, 0.1);
             flex-wrap: nowrap;
             align-items: center;
+            backdrop-filter: blur(5px);
+            -webkit-backdrop-filter: blur(5px);
         }
         
         .stat {
@@ -79,21 +131,23 @@
             grid-template-columns: auto 1fr auto;
             gap: 12px;
             align-items: center;
-            padding: 10px;
-            background: rgba(255, 255, 255, 0.1);
-            border-radius: 8px;
+            padding: 10px 16px;
+            background: rgba(255, 255, 255, 0.08);
+            border-radius: 12px;
             transition: all 0.3s ease;
-            font-weight: bold;
+            font-weight: 600;
             font-size: 1.1rem;
-            text-shadow: 1px 1px rgba(0,0,0,0.2);
+            text-shadow: none;
             border: 1px solid rgba(255, 255, 255, 0.05);
             min-width: 160px;
+            backdrop-filter: blur(5px);
+            -webkit-backdrop-filter: blur(5px);
         }
         
         .stat:hover {
             transform: translateY(-5px);
             background: rgba(255, 255, 255, 0.15);
-            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+            box-shadow: 0 8px 16px rgba(0, 0, 0, 0.15);
         }
         
         .stat i {
@@ -104,8 +158,8 @@
         }
         
         .stat span {
-            background: rgba(0, 0, 0, 0.2);
-            padding: 2px 8px;
+            background: rgba(0, 0, 0, 0.25);
+            padding: 4px 10px;
             border-radius: 12px;
             font-size: 1rem;
             min-width: 30px;
@@ -114,116 +168,126 @@
         }
         
         .deck-display {
-            background-color: var(--card-bg);
-            background-image: linear-gradient(45deg, #e0e0e0 25%, transparent 25%),
-                              linear-gradient(-45deg, #e0e0e0 25%, transparent 25%),
-                              linear-gradient(45deg, transparent 75%, #e0e0e0 75%),
-                              linear-gradient(-45deg, transparent 75%, #e0e0e0 75%);
-            background-size: 40px 40px;
-            background-position: 0 0, 0 20px, 20px -20px, -20px 0px;
-            border-radius: 15px;
-            padding: 20px;
+            background: rgba(255, 255, 255, 0.03);
+            border-radius: 20px;
+            padding: 25px;
             min-height: 300px;
-            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+            box-shadow: var(--glass-shadow);
             display: grid;
             grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
-            gap: 15px;
+            gap: 20px;
             grid-auto-rows: 1fr;
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            border: 1px solid var(--glass-border);
         }
         
         .search-section {
             display: flex;
-            gap: 10px;
-            margin-bottom: 20px;
-            margin-top: 30px;
+            gap: 15px;
+            margin-bottom: 30px;
+            margin-top: 40px;
         }
         
         #search-input {
             flex: 1;
-            padding: 12px 20px;
-            border: 2px solid var(--pokemon-yellow);
-            border-radius: 25px;
+            padding: 14px 24px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 30px;
             font-size: 1rem;
             transition: all 0.3s ease;
+            background: rgba(255, 255, 255, 0.05);
+            color: var(--text-color);
+            backdrop-filter: blur(8px);
+            -webkit-backdrop-filter: blur(8px);
         }
         
         #search-input:focus {
             outline: none;
-            border-color: var(--pokemon-blue);
-            box-shadow: 0 0 0 3px rgba(59, 76, 202, 0.2);
+            border-color: var(--pokemon-yellow);
+            box-shadow: 0 0 0 3px rgba(254, 231, 76, 0.2);
+            background: rgba(255, 255, 255, 0.1);
         }
         
         #sort-select {
-            padding: 12px 20px;
-            border: 2px solid var(--pokemon-yellow);
-            border-radius: 25px;
+            padding: 14px 24px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 30px;
             font-size: 1rem;
-            background-color: white;
+            background: rgba(255, 255, 255, 0.05);
+            color: var(--text-color);
             transition: all 0.3s ease;
+            backdrop-filter: blur(8px);
+            -webkit-backdrop-filter: blur(8px);
+            cursor: pointer;
         }
         
         #sort-select:focus {
             outline: none;
-            border-color: var(--pokemon-blue);
-            box-shadow: 0 0 0 3px rgba(59, 76, 202, 0.2);
+            border-color: var(--pokemon-yellow);
+            box-shadow: 0 0 0 3px rgba(254, 231, 76, 0.2);
+            background: rgba(255, 255, 255, 0.1);
         }
         
         #search-button {
-            padding: 12px 25px;
-            background: linear-gradient(135deg, var(--pokemon-blue), #2a3899);
+            padding: 14px 30px;
+            background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
             color: white;
             border: none;
-            border-radius: 25px;
+            border-radius: 30px;
             cursor: pointer;
             font-weight: bold;
-            transition: transform 0.2s ease;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 15px rgba(88, 101, 242, 0.3);
         }
         
         #search-button:hover {
             transform: translateY(-2px);
+            box-shadow: 0 8px 20px rgba(88, 101, 242, 0.5);
         }
         
         .search-results {
             display: grid;
             grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
-            gap: 15px;
-            padding: 15px;
-            background-color: white;
-            border-radius: 8px;
-            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            gap: 20px;
+            padding: 25px;
+            background: rgba(255, 255, 255, 0.03);
+            border-radius: 20px;
+            box-shadow: var(--glass-shadow);
             grid-auto-rows: 1fr;
             min-height: 100px;
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            border: 1px solid var(--glass-border);
         }
         
         .card {
-            background: rgb(255, 255, 255);
-            border-radius: 15px;
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 18px;
             padding: 0px;
-            box-shadow: 
-                0 2px 4px rgba(0,0,0,0.1),
-                0 8px 16px rgba(0,0,0,0.1),
-                0 16px 32px rgba(0,0,0,0.05);
-            transition: all 0.3s ease;
+            box-shadow: 0 8px 16px rgba(0, 0, 0, 0.15);
+            transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
             position: relative;
             overflow: hidden;
             aspect-ratio: 2.55/3.5;
             display: flex;
             flex-direction: column;
             cursor: pointer;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(5px);
+            -webkit-backdrop-filter: blur(5px);
         }
         
         .card:hover {
-            transform: translateY(-5px);
-            box-shadow: 
-                0 4px 8px rgba(0,0,0,0.15),
-                0 12px 24px rgba(0,0,0,0.15),
-                0 24px 48px rgba(0,0,0,0.1);
+            transform: translateY(-8px) scale(1.02);
+            box-shadow: var(--card-hover-shadow);
+            border-color: rgba(255, 255, 255, 0.2);
         }
         
         .card img {
             width: 100%;
             height: 100%;
-            border-radius: 0px;
+            border-radius: 18px;
             object-fit: contain;
         }
         
@@ -445,11 +509,12 @@
             left: 0;
             right: 0;
             bottom: 0;
-            background: rgba(255, 255, 255, 0.2);
+            background: rgba(20, 24, 36, 0.8);
             z-index: 1000;
             justify-content: center;
             align-items: center;
-            backdrop-filter: blur(10px);
+            backdrop-filter: blur(15px);
+            -webkit-backdrop-filter: blur(15px);
         }
         
         .modal-overlay.active {
@@ -459,11 +524,11 @@
         .modal-content {
             background-color: transparent;
             padding: 0;
-            border-radius: 15px;
+            border-radius: 20px;
             max-width: 95%;
             width: auto;
             position: relative;
-            box-shadow: 0 5px 30px rgba(0,0,0,0.1);
+            box-shadow: var(--glass-shadow);
             transform: translateY(20px);
             transition: transform 0.3s ease-out;
         }
@@ -474,29 +539,32 @@
             width: auto;
             height: auto;
             object-fit: contain;
-            border-radius: 15px;
-            box-shadow: 0 5px 25px rgba(0, 0, 0, 0.15);
+            border-radius: 20px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
         }
         
         .card-buttons {
             position: absolute;
-            bottom: 8px;
-            right: 8px;
+            bottom: 12px;
+            right: 12px;
             z-index: 2;
             pointer-events: none;
-            background: rgba(255, 255, 255, 0.9);
-            border-radius: 12px;
-            padding: 4px;
-            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 15px;
+            padding: 6px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
             display: flex;
-            gap: 4px;
+            gap: 6px;
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
         }
         
         .card-button {
-            width: 28px;
-            height: 28px;
+            width: 32px;
+            height: 32px;
             border: none;
-            background: none;
+            background: rgba(255, 255, 255, 0.08);
             display: flex;
             align-items: center;
             justify-content: center;
@@ -505,57 +573,61 @@
             padding: 4px;
             margin: 0;
             pointer-events: auto;
-            transition: transform 0.2s, opacity 0.2s;
+            transition: all 0.2s ease;
             opacity: 0.85;
-            border-radius: 8px;
+            border-radius: 10px;
+            color: white;
         }
         
         .card-button:hover {
-            transform: scale(1.2);
+            transform: scale(1.15);
             opacity: 1;
-            background: rgba(255, 255, 255, 0.95);
+            background: rgba(255, 255, 255, 0.2);
         }
         
         .card-button.decrease-button {
-            color: #e74c3c;
+            color: var(--secondary-color);
         }
         
         .card-button.increase-button {
-            color: #2ecc71;
+            color: var(--accent-color);
         }
         
         .card-button.tcgplayer-button {
-            color: #0a5;
+            color: var(--pokemon-yellow);
             font-size: 16px;
-            border-left: 1px solid rgba(0, 0, 0, 0.1);
+            border-left: 1px solid rgba(255, 255, 255, 0.1);
             padding-left: 8px;
         }
         
         .card-button.tcgplayer-button:hover {
-            color: #0c6;
-            background: rgba(0, 204, 102, 0.1);
+            color: var(--pokemon-yellow);
+            background: rgba(254, 231, 76, 0.15);
         }
         
         .card-count {
             position: absolute;
-            top: 8px;
-            right: 8px;
-            background: rgba(0, 0, 0, 0.8);
+            top: 10px;
+            right: 10px;
+            background: rgba(0, 0, 0, 0.4);
             color: white;
-            padding: 4px 8px;
-            border-radius: 12px;
+            padding: 5px 10px;
+            border-radius: 15px;
             font-size: 14px;
             font-weight: bold;
             z-index: 3;
-            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
             display: flex;
             align-items: center;
             justify-content: center;
             min-width: 32px;
+            backdrop-filter: blur(5px);
+            -webkit-backdrop-filter: blur(5px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
         }
         
         .card:hover .card-count {
-            background: rgba(0, 0, 0, 0.95);
+            background: rgba(88, 101, 242, 0.6);
             transform: scale(1.1);
             transition: all 0.2s ease;
         }
@@ -611,33 +683,38 @@
         
         .button-container {
             display: flex;
-            gap: 10px;
+            gap: 12px;
             justify-content: flex-end;
             align-items: center;
-            padding-left: 15px;
-            border-left: 2px solid rgba(255, 255, 255, 0.2);
+            padding-left: 20px;
+            border-left: 2px solid rgba(255, 255, 255, 0.1);
         }
         
         .button-container button {
             padding: 0;
             border: none;
             border-radius: 50%;
-            background-color: white;
+            background: rgba(255, 255, 255, 0.08);
             cursor: pointer;
             transition: all 0.3s ease;
             font-size: 1.2rem;
-            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
-            width: 40px;
-            height: 40px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+            width: 48px;
+            height: 48px;
             display: flex;
             align-items: center;
             justify-content: center;
             line-height: 1;
+            backdrop-filter: blur(5px);
+            -webkit-backdrop-filter: blur(5px);
+            border: 1px solid rgba(255, 255, 255, 0.05);
         }
         
         .button-container button:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+            transform: translateY(-5px);
+            box-shadow: 0 8px 20px rgba(88, 101, 242, 0.3);
+            background: rgba(255, 255, 255, 0.15);
+            border-color: rgba(255, 255, 255, 0.2);
         }
         
         .button-container button::after {
@@ -646,16 +723,19 @@
             top: 100%;
             left: 50%;
             transform: translateX(-50%);
-            padding: 4px 8px;
-            background-color: #333;
+            padding: 6px 12px;
+            background: rgba(0, 0, 0, 0.7);
             color: white;
-            border-radius: 4px;
+            border-radius: 8px;
             font-size: 12px;
             white-space: nowrap;
             opacity: 0;
             visibility: hidden;
             transition: opacity 0.2s, visibility 0.2s;
-            margin-top: 5px;
+            margin-top: 8px;
+            backdrop-filter: blur(5px);
+            -webkit-backdrop-filter: blur(5px);
+            border: 1px solid rgba(255, 255, 255, 0.05);
         }
         
         .button-container button:hover::after {
@@ -722,14 +802,22 @@
         }
         
         .disclaimer {
-            background-color: rgba(0, 0, 0, 0.05);
-            padding: 10px;
-            margin: 10px 0;
-            border-radius: 5px;
+            background-color: rgba(255, 255, 255, 0.03);
+            padding: 15px;
+            margin: 20px 0;
+            border-radius: 15px;
             font-size: 0.8em;
-            color: #666;
+            color: rgba(255, 255, 255, 0.7);
             text-align: center;
             line-height: 1.4;
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+            border: 1px solid var(--glass-border);
+        }
+        
+        .disclaimer i.fa-heart {
+            color: var(--secondary-color);
+            margin: 0 3px;
         }
         
         .game-start-button {
@@ -743,6 +831,7 @@
             transition: transform 0.3s ease;
             z-index: 1001;
             text-align: center;
+            filter: drop-shadow(0 8px 16px rgba(0, 0, 0, 0.3));
         }
         
         .game-start-button.visible {
@@ -752,14 +841,19 @@
         .game-start-button::after {
             content: 'Deal Hand';
             position: absolute;
-            bottom: -25px;
+            bottom: -30px;
             left: 50%;
             transform: translateX(-50%);
             white-space: nowrap;
             color: white;
             font-weight: bold;
-            text-shadow: 1px 1px 2px rgba(0,0,0,0.5);
             font-size: 1.1em;
+            padding: 6px 14px;
+            background: rgba(88, 101, 242, 0.7);
+            border-radius: 12px;
+            backdrop-filter: blur(5px);
+            -webkit-backdrop-filter: blur(5px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
         }
         
         .game-start-button:hover {
@@ -804,9 +898,10 @@
             left: 0;
             right: 0;
             bottom: 0;
-            background: rgba(255, 255, 255, 0.2);
+            background: rgba(20, 24, 36, 0.7);
             z-index: 1000;
-            backdrop-filter: blur(10px);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
         }
         
         .game-overlay.active {
@@ -905,8 +1000,8 @@
         
         @keyframes shuffle {
             0%, 100% { transform: rotate(0deg); }
-            25% { transform: rotate(-5deg) translateX(-10px); }
-            75% { transform: rotate(5deg) translateX(10px); }
+            25% { transform: rotate(-5deg) translateX(-10px) scale(1.02); }
+            75% { transform: rotate(5deg) translateX(10px) scale(1.02); }
         }
         
         .loading-indicator {
@@ -914,49 +1009,50 @@
         }
         
         @keyframes pulse {
-            0% { opacity: 0.6; }
-            50% { opacity: 1; }
-            100% { opacity: 0.6; }
+            0% { opacity: 0.6; transform: scale(1); }
+            50% { opacity: 1; transform: scale(1.05); }
+            100% { opacity: 0.6; transform: scale(1); }
         }
         
         .price-badge {
             position: absolute;
-            bottom: 40px;
-            right: 10px;
-            background: linear-gradient(135deg, #ffcb05 0%, #e6b800 100%);
-            border: 2px solid #3c5aa6;
+            bottom: 15px;
+            left: 10px;
+            background: rgba(88, 101, 242, 0.8);
+            border: 1px solid rgba(255, 255, 255, 0.3);
             border-radius: 20px;
-            padding: 3px 8px;
+            padding: 4px 12px;
             font-size: 12px;
             font-weight: bold;
-            color: #2a75bb;
-            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.3);
+            color: white;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
             z-index: 2;
-            transition: transform 0.2s, box-shadow 0.2s;
-        }
-        
-        .price-badge .price-value {
-            text-shadow: 1px 1px 0px rgba(255, 255, 255, 0.5);
+            transition: all 0.2s ease;
+            backdrop-filter: blur(5px);
+            -webkit-backdrop-filter: blur(5px);
         }
         
         .card:hover .price-badge {
             transform: scale(1.05);
-            box-shadow: 0 3px 8px rgba(0, 0, 0, 0.4);
+            background: rgba(88, 101, 242, 0.9);
+            box-shadow: 0 6px 12px rgba(88, 101, 242, 0.4);
         }
         
         .rarity-badge {
             position: absolute;
             top: 10px;
-            right: 10px;
-            border-radius: 15px;
-            padding: 2px 6px;
+            left: 10px;
+            border-radius: 12px;
+            padding: 3px 8px;
             font-size: 10px;
             font-weight: bold;
             color: white;
-            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
             z-index: 2;
             text-transform: uppercase;
-            border: 1px solid rgba(255, 255, 255, 0.5);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            backdrop-filter: blur(5px);
+            -webkit-backdrop-filter: blur(5px);
         }
         
         .rarity-badge.common {
@@ -964,30 +1060,30 @@
         }
         
         .rarity-badge.uncommon {
-            background: linear-gradient(135deg, #2a9d8f 0%, #1a6158 100%);
+            background: linear-gradient(135deg, #57F287 0%, #1a9956 100%);
         }
         
         .rarity-badge.rare {
-            background: linear-gradient(135deg, #118ab2 0%, #0a5a75 100%);
+            background: linear-gradient(135deg, #5865F2 0%, #3a44d0 100%);
         }
         
         .rarity-badge.rare-holo {
-            background: linear-gradient(135deg, #073b4c 0%, #042431 100%);
+            background: linear-gradient(135deg, #5865F2 0%, #273aa9 100%);
         }
         
         .rarity-badge.rare-ultra, 
         .rarity-badge.ultra-rare {
-            background: linear-gradient(135deg, #9b5de5 0%, #6c3e9e 100%);
+            background: linear-gradient(135deg, #9b5de5 0%, #7540ac 100%);
         }
         
         .rarity-badge.rare-secret, 
         .rarity-badge.secret-rare {
-            background: linear-gradient(135deg, #f15bb5 0%, #b7447f 100%);
+            background: linear-gradient(135deg, #EB459E 0%, #a82c70 100%);
         }
         
         .rarity-badge.rare-rainbow, 
         .rarity-badge.rainbow-rare {
-            background: linear-gradient(135deg, #ff9e00, #ff0058, #7a00ff);
+            background: linear-gradient(135deg, #ffdd00, #ff0058, #7a00ff);
         }
         
         .rarity-badge.promo {
@@ -995,7 +1091,7 @@
         }
         
         .rarity-badge.amazing-rare {
-            background: linear-gradient(135deg, #00bbf9, #0466c8, #9b5de5);
+            background: linear-gradient(135deg, #00bbf9, #5865F2, #9b5de5);
         }
         
         .rarity-badge.unknown {
@@ -1016,23 +1112,26 @@
         
         .export-options h3 {
             text-align: center;
-            color: var(--pokemon-blue);
-            margin-bottom: 10px;
+            color: var(--text-color);
+            margin-bottom: 15px;
             font-size: 1.6rem;
         }
         
         .export-options button {
-            padding: 12px 20px;
+            padding: 14px 25px;
             border: none;
-            border-radius: 8px;
+            border-radius: 14px;
             font-size: 1rem;
             font-weight: bold;
             cursor: pointer;
-            transition: all 0.2s ease;
+            transition: all 0.3s ease;
+            backdrop-filter: blur(5px);
+            -webkit-backdrop-filter: blur(5px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
         }
         
         #exportFull {
-            background: linear-gradient(135deg, var(--pokemon-blue), #2a3899);
+            background: linear-gradient(135deg, var(--primary-color), #273aa9);
             color: white;
         }
         
@@ -1043,9 +1142,52 @@
         
         .export-options button:hover {
             transform: translateY(-3px);
-            box-shadow: 0 4px 10px rgba(0,0,0,0.2);
+            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.2);
+            border-color: rgba(255, 255, 255, 0.2);
         }
         
         .export-options button:active {
             transform: translateY(0);
+        }
+        
+        /* Add subtle hover animations to all interactive elements */
+        button, select, input, .card {
+            transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        }
+        
+        /* Add scrollbar styling */
+        ::-webkit-scrollbar {
+            width: 8px;
+            height: 8px;
+        }
+        
+        ::-webkit-scrollbar-track {
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 10px;
+        }
+        
+        ::-webkit-scrollbar-thumb {
+            background: rgba(88, 101, 242, 0.5);
+            border-radius: 10px;
+        }
+        
+        ::-webkit-scrollbar-thumb:hover {
+            background: rgba(88, 101, 242, 0.7);
+        }
+        
+        /* Button styling improvements */
+        .button-container button i {
+            font-size: 1.2rem;
+            color: var(--text-color);
+            opacity: 0.9;
+        }
+        
+        .button-container button:hover i {
+            color: var(--pokemon-yellow);
+            transform: scale(1.1);
+            opacity: 1;
+        }
+        
+        #search-button i {
+            margin-right: 5px;
         } 

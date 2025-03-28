@@ -4,15 +4,18 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="icon" type="image/x-icon" href="favicon.ico">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="styles.css">
     <script src="DeckBuilder.js"></script>
     <title>Dexsy</title>
 </head>
 <body>
     <div class="container">
-        <h1>📕 Dexsy</h1>
-        <h2> Pokémon™ Fantasy Deck Builder</h2>
+        <h1><i class="fas fa-book-open"></i> Dexsy</h1>
+        <h2>Pokémon™ Fantasy Deck Builder</h2>
         
         <div class="deck-controls-container">
             <div class="deck-stats">
@@ -33,49 +36,57 @@
                     Trainers: <span id="trainer-count">0</span>
                 </div>
                 <div class="stat">
-                    <i class="fas fa-dollar-sign"></i>
+                    <i class="fas fa-coins"></i>
                     Price: <span id="price-count">$0.00</span>
                 </div>
             </div>
             <div class="button-container">
                 <button id="undoBtn" aria-label="Undo remove" data-label="Undo" style="display: none;">
-                    ↩️
+                    <i class="fas fa-undo"></i>
                 </button>
                 <button id="sortBtn" aria-label="Sort deck" data-label="Sort" style="display: none;">
-                    🔄
+                    <i class="fas fa-sort"></i>
                 </button>
                 <button id="clearBtn" aria-label="Clear deck" data-label="Clear">
-                    🗑️
+                    <i class="fas fa-trash-alt"></i>
                 </button>
                 <button id="exportBtn" aria-label="Export deck" data-label="Save">
-                    💾
+                    <i class="fas fa-save"></i>
                 </button>
                 <button id="importBtn" aria-label="Import deck" data-label="Import">
-                    📂
+                    <i class="fas fa-file-import"></i>
                 </button>
             </div>
         </div>
 
         <div id="deck-display" class="deck-display">
             <!-- Cards will be displayed here -->
+            <div class="empty-state">
+                <i class="fas fa-clone"></i>
+                <p>Your deck will appear here</p>
+            </div>
         </div>
 
         <div class="search-section">
-            <input type="text" id="search-input" placeholder="🔍 Search for Pokémon™ cards...">
+            <input type="text" id="search-input" placeholder="Search for Pokémon™ cards...">
             <select id="sort-select">
                 <option value="setOrder">Set Order</option>
                 <option value="priceLow">Price (Low to High)</option>
                 <option value="priceHigh">Price (High to Low)</option>
             </select>
-            <button id="search-button">🔎 Search</button>
+            <button id="search-button"><i class="fas fa-search"></i> Search</button>
         </div>
 
         <div id="search-results" class="search-results">
             <!-- Search results will be displayed here -->
+            <div class="empty-state">
+                <i class="fas fa-search"></i>
+                <p>Search results will appear here</p>
+            </div>
         </div>
 
         <div class="disclaimer">
-            Dexsy was built with ❤️ by a fan like you. We are not affiliated with, endorsed, sponsored, or specifically approved by Nintendo, The Pokémon™ Company, or any of their affiliates.
+            Dexsy was built with <i class="fas fa-heart"></i> by a fan like you. We are not affiliated with, endorsed, sponsored, or specifically approved by Nintendo, The Pokémon™ Company, or any of their affiliates.
         </div>
     </div>
 
