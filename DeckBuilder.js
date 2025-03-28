@@ -208,7 +208,7 @@ class DeckBuilder {
             // Get price and rarity data
             const priceData = this.getCardPriceData(card);
             
-            // Add price and rarity information
+            // Add price information
             let priceHTML = '';
             if (priceData.price) {
                 priceHTML = `
@@ -218,20 +218,13 @@ class DeckBuilder {
                 `;
             }
 
-            // Add rarity badge
-            const rarityHTML = `
-                <div class="rarity-badge ${priceData.rarity.toLowerCase().replace(/\s+/g, '-')}">
-                    <span>${priceData.rarity}</span>
-                </div>
-            `;
-
-            // Add buttons for adding to deck (removed TCGPlayer button)
+            // Add buttons for quantity control (removed TCGPlayer button)
             const buttonsHTML = `
                 <div class="card-buttons">
-                    <button class="card-button" title="Add to deck">➕</button>
+                    <button class="card-button decrease-button" title="Decrease quantity">➖</button>
+                    <button class="card-button increase-button" title="Increase quantity">➕</button>
                 </div>
                 ${priceHTML}
-                ${rarityHTML}
             `;
             
             cardElement.innerHTML = buttonsHTML;
@@ -452,13 +445,6 @@ class DeckBuilder {
                 `;
             }
 
-            // Add rarity badge
-            const rarityHTML = `
-                <div class="rarity-badge ${priceData.rarity.toLowerCase().replace(/\s+/g, '-')}">
-                    <span>${priceData.rarity}</span>
-                </div>
-            `;
-
             // Add buttons for quantity control (removed TCGPlayer button)
             const buttonsHTML = `
                 <div class="card-buttons">
@@ -466,7 +452,6 @@ class DeckBuilder {
                     <button class="card-button increase-button" title="Increase quantity">➕</button>
                 </div>
                 ${priceHTML}
-                ${rarityHTML}
             `;
 
             cardElement.innerHTML = buttonsHTML;

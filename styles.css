@@ -294,7 +294,7 @@
         
         .card {
             background: rgba(255, 255, 255, 0.05);
-            border-radius: 18px;
+            border-radius: 8px;
             padding: 0px;
             box-shadow: 0 8px 16px rgba(0, 0, 0, 0.15);
             transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
@@ -318,7 +318,7 @@
         .card img {
             width: 100%;
             height: 100%;
-            border-radius: 18px;
+            border-radius: 8px;
             object-fit: contain;
         }
         
@@ -603,8 +603,8 @@
         
         .card-buttons {
             position: absolute;
-            bottom: 12px;
-            right: 12px;
+            bottom: 7px;
+            right: 7px;
             z-index: 2;
             pointer-events: none;
             background: rgba(255, 255, 255, 0.1);
@@ -649,6 +649,18 @@
         
         .card-button.increase-button {
             color: var(--accent-color);
+        }
+        
+        .card-button.tcgplayer-button {
+            color: var(--pokemon-yellow);
+            font-size: 16px;
+            border-left: 1px solid rgba(255, 255, 255, 0.1);
+            padding-left: 8px;
+        }
+        
+        .card-button.tcgplayer-button:hover {
+            color: var(--pokemon-yellow);
+            background: rgba(254, 231, 76, 0.15);
         }
         
         .card-count {
@@ -1107,7 +1119,6 @@
         }
         
         .price-badge::after {
-            content: '💰';
             margin-left: 5px;
             font-size: 10px;
         }
