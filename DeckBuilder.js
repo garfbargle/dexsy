@@ -3,36 +3,64 @@ class DeckBuilder {
         this.deck = [];
         this.removedCards = [];  // Track removed cards for undo
         this.sets = [];  // Add sets storage
-        this.initializeElements();
-        this.setupEventListeners();
-        
-        // Add modal overlay to the document
-        this.createModalOverlay();
-
-        // Add export/import buttons to event listeners
-        this.setupExportImport();
-
-        // Set default card back URL
-        this.cardBackUrl = 'https://images.pokemontcg.io/cardback.png';
-
-        this.initializeGameElements();
-
-        // Add pagination tracking
         this.currentPage = 1;
         this.isLoading = false;
         this.hasMoreResults = true;
         this.lastSearchQuery = '';
         this.currentSortOption = 'setOrder';
-
-        // Initialize sort button visibility
-        this.updateSortButtonVisibility();
-
-        // Make immediate search for base1 directly without waiting
-        this.searchInput.value = "#base1";
-        this.initialBaseSetSearch();
+        this.cardBackUrl = 'https://images.pokemontcg.io/cardback.png';
         
-        // Load sets for suggestions in the background
-        this.loadSetsInBackground();
+        // Show loading screen
+        this.showLoadingScreen();
+        
+        // Initialize after DOM is ready
+        setTimeout(() => {
+            this.initializeApp();
+        }, 1000);
+    }
+
+    async initializeApp() {
+        try {
+            this.initializeElements();
+            this.setupEventListeners();
+            this.createModalOverlay();
+            this.setupExportImport();
+            this.initializeGameElements();
+            this.updateSortButtonVisibility();
+            this.setupDarkMode();
+            
+            // Load initial data
+            await this.loadSetsInBackground();
+            
+            // Make initial search
+            this.searchInput.value = "#base1";
+            await this.initialBaseSetSearch();
+            
+            // Hide loading screen
+            this.hideLoadingScreen();
+            
+            this.showToast('Welcome to Dexsy! Your deck builder is ready.', 'success');
+        } catch (error) {
+            console.error('Error initializing app:', error);
+            this.hideLoadingScreen();
+            this.showToast('Error loading application. Please refresh the page.', 'error');
+        }
+    }
+
+    showLoadingScreen() {
+        const loadingScreen = document.getElementById('loadingScreen');
+        if (loadingScreen) {
+            loadingScreen.classList.remove('hidden');
+        }
+    }
+
+    hideLoadingScreen() {
+        const loadingScreen = document.getElementById('loadingScreen');
+        if (loadingScreen) {
+            setTimeout(() => {
+                loadingScreen.classList.add('hidden');
+            }, 500);
+        }
     }
 
     initializeElements() {
@@ -52,6 +80,7 @@ class DeckBuilder {
     }
 
     setupEventListeners() {
+        // Search functionality
         this.searchButton.addEventListener('click', () => this.searchCards());
         this.searchInput.addEventListener('keypress', (e) => {
             if (e.key === 'Enter' && this.searchInput.value.trim()) {
@@ -59,37 +88,120 @@ class DeckBuilder {
             }
         });
         
-        // Add sort select change listener
+        // Sort functionality
         this.sortSelect.addEventListener('change', () => {
             this.currentSortOption = this.sortSelect.value;
             if (this.searchResults.children.length > 0) {
-                // Re-sort current results
                 this.sortSearchResults(Array.from(this.searchResults.querySelectorAll('.card')));
             }
         });
         
-        // Add undo button listener
+        // Control buttons
         const undoBtn = document.getElementById('undoBtn');
         if (undoBtn) {
             undoBtn.addEventListener('click', () => this.undoCardRemoval());
         }
 
-        // Add scroll event listener for infinite scrolling
-        window.addEventListener('scroll', () => {
-            if (this.isLoading || !this.hasMoreResults) return;
-
-            const scrollPosition = window.innerHeight + window.scrollY;
-            const scrollThreshold = document.documentElement.scrollHeight - 200;
-
-            if (scrollPosition >= scrollThreshold) {
-                this.loadMoreCards();
-            }
-        });
-
-        // Add sort button listener
         const sortBtn = document.getElementById('sortBtn');
         if (sortBtn) {
             sortBtn.addEventListener('click', () => this.sortDeck());
+        }
+
+        // Infinite scrolling - listen to search results container scroll
+        const searchResultsContainer = document.querySelector('.search-results-container');
+        if (searchResultsContainer) {
+            searchResultsContainer.addEventListener('scroll', () => {
+                if (this.isLoading || !this.hasMoreResults) return;
+
+                const container = searchResultsContainer;
+                const scrollPosition = container.scrollTop + container.clientHeight;
+                const scrollThreshold = container.scrollHeight - 100; // 100px before bottom
+
+                if (scrollPosition >= scrollThreshold && this.lastSearchQuery) {
+                    this.loadMoreCards();
+                }
+            });
+        }
+
+        // Search help toggle
+        const helpToggle = document.querySelector('.help-toggle');
+        if (helpToggle) {
+            let helpTimeout;
+            helpToggle.addEventListener('mouseenter', () => {
+                clearTimeout(helpTimeout);
+            });
+            helpToggle.addEventListener('mouseleave', () => {
+                helpTimeout = setTimeout(() => {
+                    // Help content will hide via CSS
+                }, 300);
+            });
+        }
+    }
+
+    setupDarkMode() {
+        const themeToggle = document.getElementById('themeToggle');
+        if (themeToggle) {
+            // Check for saved theme or default to light
+            const savedTheme = localStorage.getItem('theme') || 'light';
+            document.documentElement.setAttribute('data-theme', savedTheme);
+            
+            // Update toggle icon
+            this.updateThemeIcon(savedTheme);
+            
+            themeToggle.addEventListener('click', () => {
+                const currentTheme = document.documentElement.getAttribute('data-theme');
+                const newTheme = currentTheme === 'dark' ? 'light' : 'dark';
+                
+                document.documentElement.setAttribute('data-theme', newTheme);
+                localStorage.setItem('theme', newTheme);
+                this.updateThemeIcon(newTheme);
+                
+                this.showToast(`Switched to ${newTheme} mode`, 'info');
+            });
+        }
+    }
+
+    updateThemeIcon(theme) {
+        const themeIcon = document.querySelector('.theme-icon');
+        if (themeIcon) {
+            themeIcon.textContent = theme === 'dark' ? '☀️' : '🌙';
+        }
+    }
+
+    showToast(message, type = 'info') {
+        const toastContainer = document.getElementById('toastContainer');
+        if (!toastContainer) return;
+
+        const toast = document.createElement('div');
+        toast.className = `toast ${type}`;
+        toast.innerHTML = `
+            <div style="display: flex; align-items: center; gap: 0.75rem;">
+                <div style="font-weight: 600; color: var(--text-primary);">${message}</div>
+            </div>
+        `;
+
+        toastContainer.appendChild(toast);
+
+        // Auto remove after 3 seconds
+        setTimeout(() => {
+            toast.style.animation = 'toastEnter 0.3s ease-out reverse';
+            setTimeout(() => {
+                if (toast.parentNode) {
+                    toast.parentNode.removeChild(toast);
+                }
+            }, 300);
+        }, 3000);
+    }
+
+    showLoadingIndicator() {
+        if (this.loadingIndicator) {
+            this.loadingIndicator.style.display = 'flex';
+        }
+    }
+
+    hideLoadingIndicator() {
+        if (this.loadingIndicator) {
+            this.loadingIndicator.style.display = 'none';
         }
     }
 
@@ -126,6 +238,8 @@ class DeckBuilder {
 
         try {
             this.isLoading = true;
+            this.showLoadingIndicator();
+            
             const searchQuery = this.buildSearchQuery(query);
 
             const response = await fetch(
@@ -137,10 +251,18 @@ class DeckBuilder {
             this.hasMoreResults = data.data.length === 20;
             
             this.displaySearchResults(data.data, false);
+            
+            if (data.data.length === 0) {
+                this.showToast('No cards found. Try a different search term.', 'info');
+            } else {
+                this.showToast(`Found ${data.data.length} cards`, 'success');
+            }
         } catch (error) {
             console.error('Error searching cards:', error);
+            this.showToast('Error searching cards. Please try again.', 'error');
         } finally {
             this.isLoading = false;
+            this.hideLoadingIndicator();
         }
     }
 
@@ -149,43 +271,88 @@ class DeckBuilder {
 
         try {
             this.isLoading = true;
+            this.showInfiniteScrollLoader();
             this.currentPage++;
 
             const searchQuery = this.buildSearchQuery(this.lastSearchQuery);
-
             const response = await fetch(
                 `https://api.pokemontcg.io/v2/cards?q=${searchQuery}&page=${this.currentPage}&pageSize=20`
             );
+            
+            if (!response.ok) {
+                throw new Error(`API request failed: ${response.status}`);
+            }
+            
             const data = await response.json();
-
             this.hasMoreResults = data.data.length === 20;
             this.displaySearchResults(data.data, true);
+            
+            if (data.data.length > 0) {
+                this.showToast(`Loaded ${data.data.length} more cards`, 'info');
+            } else {
+                this.showToast('No more cards to load', 'info');
+            }
         } catch (error) {
             console.error('Error loading more cards:', error);
+            this.showToast('Error loading more cards.', 'error');
         } finally {
             this.isLoading = false;
+            this.hideInfiniteScrollLoader();
+        }
+    }
+
+    showInfiniteScrollLoader() {
+        // Remove any existing loader
+        const existingLoader = this.searchResults.querySelector('.infinite-scroll-loader');
+        if (existingLoader) {
+            existingLoader.remove();
+        }
+
+        // Add loader to bottom of search results
+        const loader = document.createElement('div');
+        loader.className = 'infinite-scroll-loader';
+        loader.style.gridColumn = '1 / -1';
+        loader.style.textAlign = 'center';
+        loader.style.padding = 'var(--space-8)';
+        loader.style.color = 'var(--text-secondary)';
+        loader.innerHTML = `
+            <div style="display: flex; align-items: center; justify-content: center; gap: var(--space-3);">
+                <div class="spinner"></div>
+                <span>Loading more cards...</span>
+            </div>
+        `;
+        this.searchResults.appendChild(loader);
+    }
+
+    hideInfiniteScrollLoader() {
+        const loader = this.searchResults.querySelector('.infinite-scroll-loader');
+        if (loader) {
+            loader.remove();
         }
     }
 
     displaySearchResults(cards, append = false) {
-        // Remove any existing loading indicator before adding new cards
+        // Remove any existing loading indicators
         const existingLoadingIndicator = this.searchResults.querySelector('.loading-indicator');
         if (existingLoadingIndicator) {
             existingLoadingIndicator.remove();
+        }
+
+        const existingInfiniteLoader = this.searchResults.querySelector('.infinite-scroll-loader');
+        if (existingInfiniteLoader) {
+            existingInfiniteLoader.remove();
         }
 
         if (!append) {
             this.searchResults.innerHTML = '';
         }
 
-        // Sort the cards based on the current sort option
         const sortedCards = this.sortCards(cards);
 
         sortedCards.forEach(card => {
             const cardElement = document.createElement('div');
             cardElement.className = 'card';
             
-            // Store card data for sorting purposes
             cardElement.dataset.cardData = JSON.stringify({
                 name: card.name,
                 number: card.number,
@@ -193,22 +360,22 @@ class DeckBuilder {
                 price: this.getCardPriceData(card).price || 0
             });
             
-            // Create image element with card back as placeholder
             const img = document.createElement('img');
-            img.src = this.cardBackUrl;  // Show card back while loading
+            img.src = this.cardBackUrl;
             img.alt = card.name;
+            img.loading = 'lazy';
 
-            // Load the actual card image
             const actualImage = new Image();
             actualImage.onload = () => {
                 img.src = actualImage.src;
             };
+            actualImage.onerror = () => {
+                console.warn(`Failed to load image for ${card.name}`);
+            };
             actualImage.src = card.images.small;
 
-            // Get price and rarity data
             const priceData = this.getCardPriceData(card);
             
-            // Add price information
             let priceHTML = '';
             if (priceData.price) {
                 priceHTML = `
@@ -218,11 +385,10 @@ class DeckBuilder {
                 `;
             }
 
-            // Add buttons for quantity control (removed TCGPlayer button)
             const buttonsHTML = `
                 <div class="card-buttons">
-                    <button class="card-button decrease-button" title="Decrease quantity">➖</button>
-                    <button class="card-button increase-button" title="Increase quantity">➕</button>
+                    <button class="card-button decrease-button" title="Remove from deck" aria-label="Remove from deck">➖</button>
+                    <button class="card-button increase-button" title="Add to deck" aria-label="Add to deck">➕</button>
                 </div>
                 ${priceHTML}
             `;
@@ -230,7 +396,7 @@ class DeckBuilder {
             cardElement.innerHTML = buttonsHTML;
             cardElement.insertBefore(img, cardElement.firstChild);
 
-            // Add click handler for card zoom
+            // Event listeners
             cardElement.addEventListener('click', (e) => {
                 if (!e.target.classList.contains('card-button') && 
                     !e.target.closest('.price-badge')) {
@@ -238,21 +404,18 @@ class DeckBuilder {
                 }
             });
 
-            // Add click handler for decrease button
             const decreaseButton = cardElement.querySelector('.decrease-button');
             decreaseButton.addEventListener('click', (e) => {
                 e.stopPropagation();
                 this.decreaseCardQuantity(card);
             });
 
-            // Add click handler for increase button
             const increaseButton = cardElement.querySelector('.increase-button');
             increaseButton.addEventListener('click', (e) => {
                 e.stopPropagation();
                 this.increaseCardQuantity(card);
             });
 
-            // Add click handler for price badge
             const priceBadge = cardElement.querySelector('.price-badge');
             if (priceBadge) {
                 priceBadge.style.cursor = 'pointer';
@@ -270,6 +433,29 @@ class DeckBuilder {
         if (append) {
             this.sortSearchResults(Array.from(this.searchResults.querySelectorAll('.card')));
         }
+
+        // Show end-of-results indicator if no more results available
+        if (append && !this.hasMoreResults) {
+            this.showEndOfResults();
+        }
+    }
+
+    showEndOfResults() {
+        const endIndicator = document.createElement('div');
+        endIndicator.className = 'end-of-results';
+        endIndicator.style.gridColumn = '1 / -1';
+        endIndicator.style.textAlign = 'center';
+        endIndicator.style.padding = 'var(--space-8)';
+        endIndicator.style.color = 'var(--text-tertiary)';
+        endIndicator.style.fontSize = 'var(--font-size-sm)';
+        endIndicator.innerHTML = `
+            <div style="display: flex; align-items: center; justify-content: center; gap: var(--space-2);">
+                <div style="height: 1px; background: var(--border-primary); flex: 1;"></div>
+                <span>End of results</span>
+                <div style="height: 1px; background: var(--border-primary); flex: 1;"></div>
+            </div>
+        `;
+        this.searchResults.appendChild(endIndicator);
     }
 
     // New method to sort cards based on current sort option
@@ -359,6 +545,7 @@ class DeckBuilder {
         this.deck.push(card);
         this.updateDeckDisplay();
         this.updateCounters();
+        this.showToast(`Added ${card.name} to deck`, 'success');
     }
 
     // Add new method to decrease card quantity
@@ -372,6 +559,7 @@ class DeckBuilder {
         
         if (index !== -1) {
             this.removeCardFromDeck(index);
+            this.showToast(`Removed ${card.name} from deck`, 'info');
         }
     }
 
@@ -407,11 +595,9 @@ class DeckBuilder {
     updateDeckDisplay() {
         this.deckDisplay.innerHTML = '';
         
-        // Create a map to count duplicate cards and track their first occurrence
         const cardCounts = new Map();
         const firstOccurrence = new Map();
         
-        // First pass: count cards and record first occurrence
         this.deck.forEach((card, index) => {
             const cardKey = `${card.name}-${card.number}-${card.set.id}`;
             cardCounts.set(cardKey, (cardCounts.get(cardKey) || 0) + 1);
@@ -420,11 +606,27 @@ class DeckBuilder {
             }
         });
 
-        // Sort by the original order of first appearance
+        if (firstOccurrence.size === 0) {
+            const emptyState = document.createElement('div');
+            emptyState.className = 'empty-state';
+            emptyState.innerHTML = `
+                <div class="empty-icon">
+                    <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <rect x="2" y="3" width="20" height="14" rx="2" ry="2" stroke="currentColor" stroke-width="2"/>
+                        <line x1="8" y1="21" x2="16" y2="21" stroke="currentColor" stroke-width="2"/>
+                        <line x1="12" y1="17" x2="12" y2="21" stroke="currentColor" stroke-width="2"/>
+                    </svg>
+                </div>
+                <h3>Your deck is empty</h3>
+                <p>Search for cards below to start building your deck</p>
+            `;
+            this.deckDisplay.appendChild(emptyState);
+            return;
+        }
+
         const sortedCards = Array.from(firstOccurrence.entries())
             .sort((a, b) => a[1].index - b[1].index);
 
-        // Display cards in their original order
         sortedCards.forEach(([cardKey, { card }]) => {
             const cardElement = document.createElement('div');
             cardElement.className = 'card';
@@ -432,17 +634,15 @@ class DeckBuilder {
             const img = document.createElement('img');
             img.src = card.images.small;
             img.alt = card.name;
+            img.loading = 'lazy';
 
-            // Add count badge
             const count = cardCounts.get(cardKey);
             const countBadge = document.createElement('div');
             countBadge.className = 'card-count';
             countBadge.textContent = `×${count}`;
 
-            // Get price and rarity data
             const priceData = this.getCardPriceData(card);
             
-            // Add price information
             let priceHTML = '';
             if (priceData.price) {
                 priceHTML = `
@@ -452,11 +652,10 @@ class DeckBuilder {
                 `;
             }
 
-            // Add buttons for quantity control (removed TCGPlayer button)
             const buttonsHTML = `
                 <div class="card-buttons">
-                    <button class="card-button decrease-button" title="Decrease quantity">➖</button>
-                    <button class="card-button increase-button" title="Increase quantity">➕</button>
+                    <button class="card-button decrease-button" title="Remove one" aria-label="Remove one">➖</button>
+                    <button class="card-button increase-button" title="Add one" aria-label="Add one">➕</button>
                 </div>
                 ${priceHTML}
             `;
@@ -465,7 +664,7 @@ class DeckBuilder {
             cardElement.insertBefore(img, cardElement.firstChild);
             cardElement.appendChild(countBadge);
 
-            // Add click handler for card zoom
+            // Event listeners
             cardElement.addEventListener('click', (e) => {
                 if (!e.target.classList.contains('card-button') && 
                     !e.target.closest('.price-badge')) {
@@ -473,21 +672,18 @@ class DeckBuilder {
                 }
             });
 
-            // Add click handler for decrease button
             const decreaseButton = cardElement.querySelector('.decrease-button');
             decreaseButton.addEventListener('click', (e) => {
                 e.stopPropagation();
                 this.decreaseCardQuantity(card);
             });
 
-            // Add click handler for increase button
             const increaseButton = cardElement.querySelector('.increase-button');
             increaseButton.addEventListener('click', (e) => {
                 e.stopPropagation();
                 this.increaseCardQuantity(card);
             });
 
-            // Add click handler for price badge
             const priceBadge = cardElement.querySelector('.price-badge');
             if (priceBadge) {
                 priceBadge.style.cursor = 'pointer';
@@ -543,33 +739,32 @@ class DeckBuilder {
     }
 
     createModalOverlay() {
-        this.modalOverlay = document.createElement('div');
-        this.modalOverlay.className = 'modal-overlay';
-        this.modalContent = document.createElement('div');
-        this.modalContent.className = 'modal-content';
-        this.modalOverlay.appendChild(this.modalContent);
-        document.body.appendChild(this.modalOverlay);
+        this.modalOverlay = document.querySelector('.modal-overlay');
+        this.modalContent = document.querySelector('.modal-content');
 
-        // Close modal when clicking outside the image
         this.modalOverlay.addEventListener('click', (e) => {
             if (e.target === this.modalOverlay) {
+                this.modalOverlay.classList.remove('active');
+            }
+        });
+
+        // Close modal with Escape key
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'Escape' && this.modalOverlay.classList.contains('active')) {
                 this.modalOverlay.classList.remove('active');
             }
         });
     }
 
     removeCardFromDeck(index) {
-        // Store the removed card for undo
         const removedCard = this.deck[index];
         this.removedCards.push(removedCard);
         
-        // Remove only the card at the specified index
         this.deck.splice(index, 1);
         
         this.updateDeckDisplay();
         this.updateCounters();
         
-        // Show undo button if we have removed cards
         const undoBtn = document.getElementById('undoBtn');
         if (undoBtn) {
             undoBtn.style.display = this.removedCards.length > 0 ? 'block' : 'none';
@@ -577,7 +772,7 @@ class DeckBuilder {
     }
 
     showCardModal(imageUrl) {
-        this.modalContent.innerHTML = `<img src="${imageUrl}" alt="Card preview">`;
+        this.modalContent.innerHTML = `<img src="${imageUrl}" alt="Card preview" style="max-width: 100%; height: auto;">`;
         this.modalOverlay.classList.add('active');
     }
 
