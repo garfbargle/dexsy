@@ -1,0 +1,23 @@
+{
+  "name": "Dexsy - Pokémon Fantasy Deck Builder",
+  "short_name": "Dexsy",
+  "description": "Build and manage your Pokémon fantasy decks",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#1a1a1a",
+  "theme_color": "#e53e3e",
+  "icons": [
+    {
+      "src": "apple-touch-icon.png",
+      "sizes": "180x180",
+      "type": "image/png",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "app-icon.png",
+      "sizes": "1088x1088",
+      "type": "image/png",
+      "purpose": "any maskable"
+    }
+  ]
+}
